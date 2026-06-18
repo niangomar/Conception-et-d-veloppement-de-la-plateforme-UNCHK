@@ -1,0 +1,264 @@
+<div class="dashboard-wrapper">
+
+  <!-- NAVBAR -->
+  <mat-toolbar class="navbar">
+    <div class="navbar-left">
+      <img src="logoUnchk.png" alt="Logo" class="nav-logo">
+      <span class="nav-title">UN Cheikh Hamidou Kane</span>
+    </div>
+    <div class="navbar-right">
+      <button mat-icon-button><mat-icon>notifications</mat-icon></button>
+      <span class="user-name">Admin</span>
+      <button mat-icon-button routerLink="/login"><mat-icon>logout</mat-icon></button>
+    </div>
+  </mat-toolbar>
+
+  <div class="dashboard-container">
+
+    <app-sidebar></app-sidebar>
+
+    <div class="main-content">
+
+      <!-- HEADER -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Gestion des Formations</h1>
+          <p class="page-subtitle">Toutes les formations de l'université</p>
+        </div>
+        <button mat-raised-button class="add-btn" (click)="openForm()">
+          <mat-icon>add</mat-icon> Ajouter une formation
+        </button>
+      </div>
+
+      <!-- STATS 100% DYNAMIQUES -->
+      <div class="stats-grid">
+
+        <div class="stat-card blue">
+          <div class="stat-icon"><mat-icon>book</mat-icon></div>
+          <div>
+            <h2>{{ formations.length }}</h2>
+            <p>Total formations</p>
+          </div>
+        </div>
+
+        <div class="stat-card green">
+          <div class="stat-icon"><mat-icon>play_circle</mat-icon></div>
+          <div>
+            <h2>{{ statsEnCours }}</h2>
+            <p>En cours</p>
+          </div>
+        </div>
+
+        <div class="stat-card orange">
+          <div class="stat-icon"><mat-icon>schedule</mat-icon></div>
+          <div>
+            <h2>{{ statsPlanifiees }}</h2>
+            <p>Planifiées</p>
+          </div>
+        </div>
+
+        <div class="stat-card purple">
+          <div class="stat-icon"><mat-icon>people</mat-icon></div>
+          <div>
+            <h2>{{ statsTotalFormes }}</h2>
+            <p>Total formés</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RECHERCHE -->
+      <div class="search-bar">
+        <mat-icon>search</mat-icon>
+        <input type="text"
+               placeholder="Rechercher par intitulé, type, niveau..."
+               [(ngModel)]="searchText"
+               (input)="filterFormations()">
+      </div>
+
+      <!-- FORMULAIRE -->
+      <mat-card class="form-card" *ngIf="showForm">
+        <mat-card-content>
+          <h3>
+            <mat-icon>{{ editMode ? 'edit' : 'add_circle' }}</mat-icon>
+            {{ editMode ? 'Modifier' : 'Ajouter' }} une formation
+          </h3>
+
+          <div class="form-grid">
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Intitulé</mat-label>
+              <input matInput [(ngModel)]="formation.intitule"
+                     placeholder="Ex: Licence Informatique">
+              <mat-icon matSuffix>book</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Type</mat-label>
+              <mat-select [(ngModel)]="formation.type">
+                <mat-option *ngFor="let t of types" [value]="t">{{ t }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Niveau</mat-label>
+              <mat-select [(ngModel)]="formation.niveau">
+                <mat-option *ngFor="let n of niveaux" [value]="n">{{ n }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Date début</mat-label>
+              <input matInput [matDatepicker]="pickerDebut"
+                     [(ngModel)]="formation.dateDebut">
+              <mat-datepicker-toggle matSuffix [for]="pickerDebut"></mat-datepicker-toggle>
+              <mat-datepicker #pickerDebut></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Date fin</mat-label>
+              <input matInput [matDatepicker]="pickerFin"
+                     [(ngModel)]="formation.dateFin">
+              <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
+              <mat-datepicker #pickerFin></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Nombre hommes</mat-label>
+              <input matInput type="number" [(ngModel)]="formation.nombreHommes">
+              <mat-icon matSuffix>man</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Nombre femmes</mat-label>
+              <input matInput type="number" [(ngModel)]="formation.nombreFemmes">
+              <mat-icon matSuffix>woman</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Type financement</mat-label>
+              <mat-select [(ngModel)]="formation.typeFinancement">
+                <mat-option *ngFor="let tf of typesFinancement" [value]="tf">
+                  {{ tf }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Montant financement (FCFA)</mat-label>
+              <input matInput type="number" [(ngModel)]="formation.montantFinancement">
+              <mat-icon matSuffix>payments</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Statut</mat-label>
+              <mat-select [(ngModel)]="formation.statut">
+                <mat-option *ngFor="let s of statuts" [value]="s">{{ s }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Description</mat-label>
+              <textarea matInput [(ngModel)]="formation.description"
+                        rows="3"
+                        placeholder="Décrivez la formation..."></textarea>
+              <mat-icon matSuffix>notes</mat-icon>
+            </mat-form-field>
+
+          </div>
+
+          <div class="form-actions">
+            <button mat-button (click)="showForm = false">Annuler</button>
+            <button mat-raised-button class="add-btn" (click)="saveFormation()">
+              <mat-icon>save</mat-icon>
+              {{ editMode ? 'Modifier' : 'Enregistrer' }}
+            </button>
+          </div>
+
+        </mat-card-content>
+      </mat-card>
+
+      <!-- CARDS FORMATIONS -->
+      <div class="formations-grid">
+
+        <mat-card class="formation-card" *ngFor="let f of filteredFormations">
+          <mat-card-content>
+
+            <div class="card-header">
+              <div class="avatar"><mat-icon>book</mat-icon></div>
+              <div class="card-actions">
+                <button mat-icon-button color="primary"
+                        (click)="editFormation(f)"
+                        matTooltip="Modifier">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn"
+                        (click)="deleteFormation(f.id)"
+                        matTooltip="Supprimer">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <h3 class="formation-titre">{{ f.intitule }}</h3>
+
+            <div class="type-badge">
+              <mat-icon>school</mat-icon>
+              {{ f.type }} — {{ f.niveau }}
+            </div>
+
+            <div class="formation-infos">
+
+              <div class="info-item" *ngIf="f.dateDebut">
+                <mat-icon>calendar_today</mat-icon>
+                <span>{{ f.dateDebut | date:'dd/MM/yyyy' }}
+                  → {{ f.dateFin | date:'dd/MM/yyyy' }}</span>
+              </div>
+
+              <div class="info-item" *ngIf="f.typeFinancement">
+                <mat-icon>payments</mat-icon>
+                <span>{{ f.typeFinancement }}
+                  <span *ngIf="f.montantFinancement">
+                    — {{ f.montantFinancement | number }} FCFA
+                  </span>
+                </span>
+              </div>
+
+              <div class="info-item" *ngIf="f.nombreHommes || f.nombreFemmes">
+                <mat-icon>people</mat-icon>
+                <span>
+                  {{ getTotal(f) }} formés
+                  ({{ f.nombreHommes || 0 }} H / {{ f.nombreFemmes || 0 }} F)
+                </span>
+              </div>
+
+              <div class="info-item" *ngIf="f.description">
+                <mat-icon>notes</mat-icon>
+                <span>{{ f.description }}</span>
+              </div>
+
+            </div>
+
+            <div class="card-footer">
+              <span class="statut-badge" [ngClass]="getStatutClass(f.statut)">
+                <mat-icon>{{ getStatutIcon(f.statut) }}</mat-icon>
+                {{ f.statut || 'Planifiée' }}
+              </span>
+            </div>
+
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Message si vide -->
+        <div class="empty-msg" *ngIf="filteredFormations.length === 0">
+          <mat-icon>book</mat-icon>
+          <p>Aucune formation trouvée.</p>
+          <button mat-raised-button class="add-btn" (click)="openForm()">
+            <mat-icon>add</mat-icon> Ajouter la première
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

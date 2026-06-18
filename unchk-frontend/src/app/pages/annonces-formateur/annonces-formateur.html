@@ -1,0 +1,148 @@
+<div class="app-wrapper">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <img src="logoUnchk.png" alt="Logo" class="nav-logo">
+      <span class="nav-title">UN Cheikh Hamidou Kane</span>
+    </div>
+    <div class="menu-label">MENU FORMATEUR</div>
+    <a class="menu-item" routerLink="/dashboard-formateur"       routerLinkActive="active"><mat-icon>home</mat-icon><span>Tableau de bord</span></a>
+    <a class="menu-item" routerLink="/mes-cours"                 routerLinkActive="active"><mat-icon>menu_book</mat-icon><span>Mes cours</span></a>
+    <a class="menu-item" routerLink="/emploi-du-temps-formateur" routerLinkActive="active"><mat-icon>calendar_today</mat-icon><span>Emploi du temps</span></a>
+    <a class="menu-item" routerLink="/mes-etudiants"             routerLinkActive="active"><mat-icon>groups</mat-icon><span>Mes étudiants</span></a>
+    <a class="menu-item" routerLink="/devoirs-formateur"         routerLinkActive="active"><mat-icon>assignment</mat-icon><span>Devoirs & Examens</span></a>
+    <a class="menu-item" routerLink="/documents-formateur"       routerLinkActive="active"><mat-icon>upload_file</mat-icon><span>Déposer documents</span></a>
+    <a class="menu-item" routerLink="/annonces-formateur"        routerLinkActive="active"><mat-icon>campaign</mat-icon><span>Annonces</span></a>
+    <a class="menu-item" routerLink="/mon-profil-formateur"      routerLinkActive="active"><mat-icon>person</mat-icon><span>Mon profil</span></a>
+    <div class="sidebar-footer">
+      <div class="year-badge">
+        <mat-icon>school</mat-icon>
+        <div><small>Année universitaire</small><strong>2025 - 2026</strong></div>
+      </div>
+      <a class="menu-item logout" routerLink="/login"><mat-icon>logout</mat-icon><span>Déconnexion</span></a>
+    </div>
+  </div>
+
+  <!-- CONTENU -->
+  <div class="main-content">
+    <div class="topbar">
+      <h2>Annonces</h2>
+      <div class="topbar-right">
+        <div class="notif-btn"><mat-icon>notifications</mat-icon><span class="badge">2</span></div>
+        <div class="user-info">
+          <div class="avatar">{{ prenomUtilisateur[0] }}{{ nomUtilisateur[0] }}</div>
+          <span>{{ prenomUtilisateur }} {{ nomUtilisateur }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="body-content">
+      <div class="welcome-bar">
+        <div>
+          <h1>📢 Annonces</h1>
+          <p>Communiquez avec vos étudiants</p>
+        </div>
+        <button class="btn-new" (click)="toggleForm()">
+          <mat-icon>add</mat-icon> Nouvelle annonce
+        </button>
+      </div>
+
+      <!-- Formulaire nouvelle annonce -->
+      <div class="form-card" *ngIf="showForm">
+        <h3>✏️ Créer une annonce</h3>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>Titre</label>
+            <input type="text" placeholder="Titre de l'annonce...">
+          </div>
+          <div class="form-group">
+            <label>Cours</label>
+            <select>
+              <option>Algorithmique</option>
+              <option>Base de données</option>
+              <option>Structures de données</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Type</label>
+            <select>
+              <option value="info">Information</option>
+              <option value="urgent">Urgent</option>
+              <option value="examen">Examen</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>Message</label>
+            <textarea rows="3" placeholder="Contenu de l'annonce..."></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-cancel" (click)="toggleForm()">Annuler</button>
+          <button class="btn-submit"><mat-icon>send</mat-icon> Publier</button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon"><mat-icon>campaign</mat-icon></div>
+          <div class="stat-info"><h2>{{ annonces.length }}</h2><p>Annonces</p><small>au total</small></div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon"><mat-icon>warning</mat-icon></div>
+          <div class="stat-info"><h2>{{ nbUrgentes }}</h2><p>Urgentes</p><small>à traiter</small></div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon"><mat-icon>info</mat-icon></div>
+          <div class="stat-info"><h2>{{ nbInfos }}</h2><p>Informations</p><small>publiées</small></div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon"><mat-icon>school</mat-icon></div>
+          <div class="stat-info"><h2>{{ nbExamens }}</h2><p>Examens</p><small>annoncés</small></div>
+        </div>
+      </div>
+
+      <!-- Filtres -->
+      <div class="filtres-bar">
+        <button [class.actif]="filtreActif === 'tous'"   (click)="filtrer('tous')">Toutes</button>
+        <button [class.actif]="filtreActif === 'urgent'" (click)="filtrer('urgent')">Urgentes</button>
+        <button [class.actif]="filtreActif === 'info'"   (click)="filtrer('info')">Informations</button>
+        <button [class.actif]="filtreActif === 'examen'" (click)="filtrer('examen')">Examens</button>
+      </div>
+
+      <!-- Liste annonces -->
+      <div class="annonces-list">
+        <div class="annonce-card" *ngFor="let a of annoncesFiltrees">
+
+          <div class="annonce-left" [ngClass]="'side-' + a.color">
+            <div class="annonce-icon-wrap" [ngClass]="'icon-' + a.color">
+              <mat-icon>{{ a.icon }}</mat-icon>
+            </div>
+          </div>
+
+          <div class="annonce-body">
+            <div class="annonce-top">
+              <h3>{{ a.titre }}</h3>
+              <div class="type-badge" [ngClass]="'type-' + a.type">{{ getTypeLabel(a.type) }}</div>
+            </div>
+            <p>{{ a.description }}</p>
+            <div class="annonce-meta">
+              <span><mat-icon>menu_book</mat-icon> {{ a.cours }}</span>
+              <span><mat-icon>school</mat-icon> {{ a.formation }}</span>
+              <span><mat-icon>calendar_today</mat-icon> {{ a.date }}</span>
+              <span><mat-icon>visibility</mat-icon> {{ a.vues }} vues</span>
+            </div>
+          </div>
+
+          <div class="annonce-actions">
+            <button class="btn-icon"><mat-icon>edit</mat-icon></button>
+            <button class="btn-icon danger"><mat-icon>delete</mat-icon></button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

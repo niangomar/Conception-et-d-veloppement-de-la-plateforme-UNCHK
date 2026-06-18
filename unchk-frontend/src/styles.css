@@ -1,0 +1,8 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  background: #e8edf2;
+}
+.snack-success { background-color: #2E7D32 !important; color: white !important; }
+.snack-error { background-color: #C62828 !important; color: white !important; }
+.snack-warning { background-color: #E65100 !important; color: white !important; }

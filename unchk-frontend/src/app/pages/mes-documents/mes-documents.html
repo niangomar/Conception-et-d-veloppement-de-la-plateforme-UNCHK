@@ -1,0 +1,386 @@
+<div class="app-wrapper">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <img src="logoUnchk.png" alt="Logo" class="nav-logo">
+      <span class="nav-title">UN Cheikh Hamidou Kane</span>
+    </div>
+    <div class="menu-label">MENU ÉTUDIANT</div>
+    <a class="menu-item" routerLink="/dashboard-etudiant" routerLinkActive="active">
+      <mat-icon>home</mat-icon><span>Tableau de bord</span>
+    </a>
+    <a class="menu-item" routerLink="/emploi-du-temps" routerLinkActive="active">
+      <mat-icon>calendar_today</mat-icon><span>Emploi du temps</span>
+    </a>
+    <a class="menu-item" routerLink="/mes-devoirs" routerLinkActive="active">
+      <mat-icon>assignment</mat-icon><span>Mes devoirs</span>
+    </a>
+    <a class="menu-item" routerLink="/examens-etudiant" routerLinkActive="active">
+      <mat-icon>quiz</mat-icon><span>Examens</span>
+    </a>
+    <a class="menu-item" routerLink="/mes-documents" routerLinkActive="active">
+      <mat-icon>description</mat-icon><span>Mes documents</span>
+    </a>
+    <a class="menu-item" routerLink="/annonces" routerLinkActive="active">
+      <mat-icon>campaign</mat-icon><span>Annonces</span>
+    </a>
+    <a class="menu-item" routerLink="/mon-profil" routerLinkActive="active">
+      <mat-icon>person</mat-icon><span>Mon profil</span>
+    </a>
+    <div class="sidebar-footer">
+      <div class="year-badge">
+        <mat-icon>school</mat-icon>
+        <div>
+          <small>Année universitaire</small>
+          <strong>2025 - 2026</strong>
+        </div>
+      </div>
+      <a class="menu-item logout" routerLink="/login">
+        <mat-icon>logout</mat-icon><span>Déconnexion</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Contenu principal -->
+  <div class="main-content">
+    <div class="topbar">
+      <h2>Mes documents</h2>
+      <div class="topbar-right">
+        <div class="notif-btn">
+          <mat-icon>notifications</mat-icon>
+          <span class="badge">3</span>
+        </div>
+        <div class="user-info">
+          <div class="avatar">{{ prenomUtilisateur[0] }}{{ nomUtilisateur[0] }}</div>
+          <span>{{ prenomUtilisateur }} {{ nomUtilisateur }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="body-content">
+
+      <!-- En-tête + bouton ajouter -->
+      <div class="welcome-row">
+        <div class="welcome">
+          <h1>Mes documents</h1>
+          <p>Consultez et téléchargez vos supports de cours</p>
+        </div>
+        <button class="btn-ajouter" (click)="ouvrirModal()">
+          <mat-icon>add</mat-icon>
+          Ajouter un document
+        </button>
+      </div>
+
+      <!-- Cartes stats -->
+      <div class="stats-grid">
+        <div class="stat-card blue" (click)="filtrer('tous')" [class.actif-card]="filtreActif==='tous'">
+          <div class="stat-icon"><mat-icon>folder</mat-icon></div>
+          <div class="stat-info">
+            <h2>{{ nbTotal }}</h2>
+            <p>Total</p>
+            <small>documents</small>
+          </div>
+        </div>
+        <div class="stat-card green" (click)="filtrer('cours')" [class.actif-card]="filtreActif==='cours'">
+          <div class="stat-icon"><mat-icon>menu_book</mat-icon></div>
+          <div class="stat-info">
+            <h2>{{ nbCours }}</h2>
+            <p>Cours</p>
+            <small>disponibles</small>
+          </div>
+        </div>
+        <div class="stat-card orange" (click)="filtrer('tp')" [class.actif-card]="filtreActif==='tp'">
+          <div class="stat-icon"><mat-icon>science</mat-icon></div>
+          <div class="stat-info">
+            <h2>{{ nbTP }}</h2>
+            <p>TP / TD</p>
+            <small>disponibles</small>
+          </div>
+        </div>
+        <div class="stat-card red" (click)="filtrer('examen')" [class.actif-card]="filtreActif==='examen'">
+          <div class="stat-icon"><mat-icon>quiz</mat-icon></div>
+          <div class="stat-info">
+            <h2>{{ nbExamens }}</h2>
+            <p>Examens</p>
+            <small>anciens sujets</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barre recherche + filtres -->
+      <div class="toolbar">
+        <div class="search-box">
+          <mat-icon>search</mat-icon>
+          <input type="text"
+                 placeholder="Rechercher par titre, matière, référence..."
+                 (input)="onRecherche($event)">
+        </div>
+        <div class="filtres">
+          <button [class.actif]="filtreActif === 'tous'"   (click)="filtrer('tous')">Tous</button>
+          <button [class.actif]="filtreActif === 'pdf'"    (click)="filtrer('pdf')">PDF</button>
+          <button [class.actif]="filtreActif === 'doc'"    (click)="filtrer('doc')">DOC</button>
+          <button [class.actif]="filtreActif === 'ppt'"    (click)="filtrer('ppt')">PPT</button>
+          <button [class.actif]="filtreActif === 'cours'"  (click)="filtrer('cours')">Cours</button>
+          <button [class.actif]="filtreActif === 'tp'"     (click)="filtrer('tp')">TP/TD</button>
+          <button [class.actif]="filtreActif === 'examen'" (click)="filtrer('examen')">Examens</button>
+        </div>
+      </div>
+
+      <!-- Chargement -->
+      @if (chargement) {
+      <div class="loading">
+        <mat-icon>hourglass_empty</mat-icon>
+        <p>Chargement des documents...</p>
+      </div>
+      }
+
+      <!-- Liste documents -->
+      @if (!chargement) {
+      <div class="card">
+        <div class="card-header">
+          <h3>Documents disponibles</h3>
+          <div class="card-header-right">
+            <span class="count-badge">{{ documentsFiltres.length }} document(s)</span>
+            <span class="dispo-badge">{{ nbDispo }} téléchargeables</span>
+          </div>
+        </div>
+
+        <!-- Vide -->
+        @if (documentsFiltres.length === 0) {
+        <div class="vide">
+          <mat-icon>folder_open</mat-icon>
+          <p>Aucun document trouvé</p>
+          <button class="btn-ajouter-small" (click)="ouvrirModal()">
+            <mat-icon>add</mat-icon> Ajouter un document
+          </button>
+        </div>
+        }
+
+        <!-- Liste -->
+        @if (documentsFiltres.length > 0) {
+        <div class="doc-list">
+          @for (d of documentsFiltres; track d.id) {
+          <div class="doc-item" [class.has-file]="hasFichier(d)">
+
+            <!-- Icône extension -->
+            <div class="doc-ext" [ngClass]="getExtClassFromDoc(d)">
+              {{ getExtFromDoc(d) }}
+            </div>
+
+            <!-- Infos -->
+            <div class="doc-info">
+              <div class="doc-title-row">
+                <strong>{{ d.titre }}</strong>
+                <span class="type-badge" [ngClass]="getTypeBadgeClass(d.type)">
+                        <mat-icon>{{ getTypeIcon(d.type) }}</mat-icon>
+                        {{ d.type }}
+                      </span>
+                @if (d.blobUrl) {
+                <span class="local-badge">
+                          <mat-icon>computer</mat-icon> Local
+                        </span>
+                }
+              </div>
+              @if (d.description) {
+              <span class="doc-desc">{{ d.description }}</span>
+              }
+              <div class="doc-meta">
+                @if (d.matiere) {
+                <span><mat-icon>school</mat-icon> {{ d.matiere }}</span>
+                }
+                <span><mat-icon>category</mat-icon> {{ d.type }}</span>
+                <span><mat-icon>calendar_today</mat-icon> {{ formaterDate(d.date_doc) }}</span>
+                <span><mat-icon>tag</mat-icon> {{ d.reference }}</span>
+                @if (d.taille) {
+                <span><mat-icon>data_usage</mat-icon> {{ d.taille }}</span>
+                }
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="doc-actions">
+              <span class="statut-badge" [ngClass]="d.statut">{{ d.statut }}</span>
+              @if (hasFichier(d)) {
+              <button class="dl-btn" (click)="telecharger(d)">
+                <mat-icon>download</mat-icon>
+                Télécharger
+              </button>
+              } @else {
+              <span class="pas-fichier">
+                        <mat-icon>hourglass_empty</mat-icon>
+                        Pas encore disponible
+                      </span>
+              }
+              <button class="del-btn" (click)="supprimerDocument(d)" title="Supprimer">
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            </div>
+
+          </div>
+          }
+        </div>
+        }
+      </div>
+      }
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════ MODAL AJOUT DOCUMENT ════════════════ -->
+@if (modalOuvert) {
+<div class="modal-overlay" (click)="fermerModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+
+    <!-- Header modal -->
+    <div class="modal-header">
+      <div class="modal-title">
+        <div class="modal-title-icon"><mat-icon>upload_file</mat-icon></div>
+        <div>
+          <h3>Ajouter un document</h3>
+          <p>Remplissez les informations et joignez votre fichier</p>
+        </div>
+      </div>
+      <button class="btn-close" (click)="fermerModal()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Corps modal -->
+    <div class="modal-body">
+
+      @if (msgSucces) {
+      <div class="alert-succes">
+        <mat-icon>check_circle</mat-icon>
+        {{ msgSucces }}
+      </div>
+      }
+
+      @if (msgErreurForm) {
+      <div class="alert-erreur">
+        <mat-icon>error</mat-icon>
+        {{ msgErreurForm }}
+      </div>
+      }
+
+      <!-- Zone upload fichier -->
+      <div class="upload-zone" [class.has-file]="!!fichierSelectionne"
+           (dragover)="$event.preventDefault()"
+           (drop)="onFichierChange($event)">
+        @if (!fichierSelectionne) {
+        <label for="inputFichier" class="upload-label">
+          <mat-icon>cloud_upload</mat-icon>
+          <strong>Cliquez pour choisir un fichier</strong>
+          <span>ou glissez-déposez ici</span>
+          <small>PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX (max 20 Mo)</small>
+        </label>
+        <input id="inputFichier" type="file"
+               accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx"
+               (change)="onFichierChange($event)"
+               style="display:none">
+        } @else {
+        <div class="fichier-choisi">
+          <div class="fichier-icone" [ngClass]="getExtClass(fichierSelectionne.name)">
+            {{ getExt(fichierSelectionne.name) }}
+          </div>
+          <div class="fichier-details">
+            <strong>{{ fichierSelectionne.name }}</strong>
+            <span>{{ formatTailleFichier(fichierSelectionne) }}</span>
+          </div>
+          <button class="btn-retirer" (click)="supprimerFichier()" title="Retirer le fichier">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        }
+      </div>
+
+      <!-- Grille formulaire -->
+      <div class="form-grid">
+
+        <div class="form-group full">
+          <label>Titre <span class="requis">*</span></label>
+          <input type="text" [(ngModel)]="nouveauDoc.titre"
+                 placeholder="Ex : Cours Algorithmique - Chapitre 3">
+        </div>
+
+        <div class="form-group">
+          <label>Type <span class="requis">*</span></label>
+          <select [(ngModel)]="nouveauDoc.type">
+            @for (t of typesDoc; track t) {
+            <option [value]="t">{{ t }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Matière</label>
+          <select [(ngModel)]="nouveauDoc.matiere">
+            <option value="">-- Choisir --</option>
+            @for (m of matieres; track m) {
+            <option [value]="m">{{ m }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Référence</label>
+          <input type="text" [(ngModel)]="nouveauDoc.reference"
+                 placeholder="Ex : ALG-2026-003">
+        </div>
+
+        <div class="form-group">
+          <label>Date du document</label>
+          <input type="date" [(ngModel)]="nouveauDoc.date_doc">
+        </div>
+
+        <div class="form-group">
+          <label>Statut</label>
+          <select [(ngModel)]="nouveauDoc.statut">
+            <option value="actif">Actif</option>
+            <option value="archive">Archivé</option>
+            <option value="inactif">Inactif</option>
+          </select>
+        </div>
+
+        <div class="form-group full">
+          <label>Description</label>
+          <textarea [(ngModel)]="nouveauDoc.description" rows="3"
+                    placeholder="Décrivez brièvement le contenu de ce document..."></textarea>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Footer modal -->
+    <div class="modal-footer">
+      <button class="btn-annuler" (click)="fermerModal()" [disabled]="enEnvoi">
+        <mat-icon>close</mat-icon>
+        Annuler
+      </button>
+      <button class="btn-soumettre" (click)="soumettre()" [disabled]="enEnvoi">
+        @if (enEnvoi) {
+        <mat-icon class="spin">hourglass_empty</mat-icon>
+        Enregistrement...
+        } @else {
+        <mat-icon>save</mat-icon>
+        Enregistrer
+        }
+      </button>
+    </div>
+
+  </div>
+</div>
+}
+
+
+<!-- ════════════════ TOAST ════════════════ -->
+@if (toastVisible) {
+<div class="doc-toast" [ngClass]="'toast-' + toastType">
+  <mat-icon>
+    {{ toastType === 'success' ? 'check_circle' : toastType === 'warning' ? 'warning' : 'info' }}
+  </mat-icon>
+  <span>{{ toastMessage }}</span>
+  <button (click)="toastVisible = false"><mat-icon>close</mat-icon></button>
+</div>
+}

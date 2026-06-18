@@ -1,0 +1,249 @@
+<div class="dashboard-wrapper">
+
+  <!-- NAVBAR -->
+  <mat-toolbar class="navbar">
+    <div class="navbar-left">
+      <img src="logoUnchk.png" alt="Logo" class="nav-logo">
+      <span class="nav-title">UN Cheikh Hamidou Kane</span>
+    </div>
+    <div class="navbar-right">
+      <button mat-icon-button matTooltip="Notifications">
+        <mat-icon>notifications</mat-icon>
+      </button>
+      <div class="admin-info">
+        <mat-icon class="admin-icon">account_circle</mat-icon>
+        <span class="user-name">Admin</span>
+      </div>
+      <button mat-icon-button routerLink="/login" matTooltip="Déconnexion">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
+  </mat-toolbar>
+
+  <div class="dashboard-container">
+    <app-sidebar></app-sidebar>
+
+    <div class="main-content">
+
+      <!-- HEADER -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Comptes Rendus</h1>
+          <p class="page-subtitle">Réunions, séminaires, webinaires et conseils d'université</p>
+        </div>
+        <button mat-raised-button class="add-btn" (click)="openForm()">
+          <mat-icon>add</mat-icon> Nouveau compte rendu
+        </button>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon"><mat-icon>description</mat-icon></div>
+          <div><h2>{{ comptesRendus.length }}</h2><p>Total comptes rendus</p></div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon"><mat-icon>check_circle</mat-icon></div>
+          <div><h2>{{ getActifs() }}</h2><p>Actifs</p></div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon"><mat-icon>groups</mat-icon></div>
+          <div><h2>{{ getCount('Réunion') }}</h2><p>Réunions</p></div>
+        </div>
+        <div class="stat-card rouge">
+          <div class="stat-icon"><mat-icon>inventory_2</mat-icon></div>
+          <div><h2>{{ getArchives() }}</h2><p>Archivés</p></div>
+        </div>
+      </div>
+
+      <!-- FILTRES -->
+      <div class="filter-bar">
+        <button class="filter-btn" [class.active]="currentFilter === ''" (click)="filterType('')">
+          <mat-icon>filter_list</mat-icon> Tous
+        </button>
+        <button class="filter-btn" [class.active]="currentFilter === 'Réunion'" (click)="filterType('Réunion')">
+          <mat-icon>groups</mat-icon> Réunions
+        </button>
+        <button class="filter-btn" [class.active]="currentFilter === 'Rencontre'" (click)="filterType('Rencontre')">
+          <mat-icon>handshake</mat-icon> Rencontres
+        </button>
+        <button class="filter-btn" [class.active]="currentFilter === 'Séminaire'" (click)="filterType('Séminaire')">
+          <mat-icon>school</mat-icon> Séminaires
+        </button>
+        <button class="filter-btn" [class.active]="currentFilter === 'Webinaire'" (click)="filterType('Webinaire')">
+          <mat-icon>videocam</mat-icon> Webinaires
+        </button>
+        <button class="filter-btn" [class.active]="currentFilter === 'Conseil d\'Université'"
+                (click)="filterType('Conseil d\'Université')">
+          <mat-icon>account_balance</mat-icon> Conseil d'Université
+        </button>
+      </div>
+
+      <!-- RECHERCHE -->
+      <div class="search-bar">
+        <mat-icon>search</mat-icon>
+        <input type="text"
+               placeholder="Rechercher par titre, lieu, contenu..."
+               [(ngModel)]="searchText"
+               (input)="filterSearch()">
+      </div>
+
+      <!-- FORMULAIRE -->
+      <mat-card class="form-card" *ngIf="showForm">
+        <mat-card-content>
+          <h3>
+            <mat-icon>{{ editMode ? 'edit' : 'add_circle' }}</mat-icon>
+            {{ editMode ? 'Modifier' : 'Créer' }} un compte rendu
+          </h3>
+          <div class="form-grid">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Titre</mat-label>
+              <input matInput [(ngModel)]="compteRendu.titre" placeholder="Ex: Réunion pédagogique du 17 Mai">
+              <mat-icon matSuffix>title</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Type</mat-label>
+              <mat-select [(ngModel)]="compteRendu.type">
+                <mat-option *ngFor="let t of types" [value]="t">{{ t }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Date de la séance</mat-label>
+              <input matInput [matDatepicker]="picker" [(ngModel)]="compteRendu.dateSeance">
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Lieu</mat-label>
+              <input matInput [(ngModel)]="compteRendu.lieu" placeholder="Ex: Salle de conférence A">
+              <mat-icon matSuffix>place</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Accès</mat-label>
+              <mat-select [(ngModel)]="compteRendu.roleAcces">
+                <mat-option *ngFor="let r of rolesAcces" [value]="r">{{ r }}</mat-option>
+              </mat-select>
+              <mat-icon matSuffix>lock</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Statut</mat-label>
+              <mat-select [(ngModel)]="compteRendu.statut">
+                <mat-option *ngFor="let s of statuts" [value]="s">{{ s }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Participants</mat-label>
+              <textarea matInput [(ngModel)]="compteRendu.participants" rows="2"
+                        placeholder="Liste des participants..."></textarea>
+              <mat-icon matSuffix>groups</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Contenu</mat-label>
+              <textarea matInput [(ngModel)]="compteRendu.contenu" rows="6"
+                        placeholder="Compte rendu détaillé..."></textarea>
+              <mat-icon matSuffix>description</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <div class="form-actions">
+            <button mat-button (click)="showForm = false">Annuler</button>
+            <button mat-raised-button class="add-btn" (click)="saveCompteRendu()">
+              <mat-icon>save</mat-icon> {{ editMode ? 'Modifier' : 'Enregistrer' }}
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- TABLEAU -->
+      <div class="table-wrapper">
+        <table class="cr-table">
+          <thead>
+          <tr>
+            <th>Type</th>
+            <th>Titre</th>
+            <th>Date</th>
+            <th>Lieu</th>
+            <th>Auteur</th>
+            <th>Accès</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let c of filteredComptesRendus">
+            <td>
+                <span class="type-badge" [ngClass]="getTypeColor(c.type)">
+                  <mat-icon>{{ getTypeIcon(c.type) }}</mat-icon>
+                  {{ c.type }}
+                </span>
+            </td>
+            <td>
+              <strong class="cr-titre">{{ c.titre }}</strong>
+              <small *ngIf="c.contenu" class="cr-contenu-preview">
+                {{ c.contenu | slice:0:60 }}...
+              </small>
+            </td>
+            <td>
+              <span *ngIf="c.date_seance">{{ c.date_seance | date:'dd/MM/yyyy' }}</span>
+              <span *ngIf="!c.date_seance" class="text-muted">—</span>
+            </td>
+            <td>
+              <div class="lieu-cell" *ngIf="c.lieu">
+                <mat-icon>place</mat-icon> {{ c.lieu }}
+              </div>
+              <span *ngIf="!c.lieu" class="text-muted">—</span>
+            </td>
+            <td>
+              <div class="auteur-cell" *ngIf="c.auteur">
+                <mat-icon>person</mat-icon> {{ c.auteur.prenom }} {{ c.auteur.nom }}
+              </div>
+              <span *ngIf="!c.auteur" class="text-muted">—</span>
+            </td>
+            <td>
+                <span class="acces-badge" *ngIf="c.role_acces">
+                  <mat-icon>lock</mat-icon> {{ c.role_acces }}
+                </span>
+            </td>
+            <td>
+                <span class="statut-badge" [ngClass]="getStatutClass(c.statut)">
+                  <mat-icon>{{ getStatutIcon(c.statut) }}</mat-icon>
+                  {{ c.statut }}
+                </span>
+            </td>
+            <td>
+              <div class="action-btns">
+                <button mat-icon-button color="primary" (click)="editCompteRendu(c)" matTooltip="Modifier">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button (click)="archiverCompteRendu(c.id)" matTooltip="Archiver"
+                        *ngIf="c.statut === 'Actif'">
+                  <mat-icon>inventory_2</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="deleteCompteRendu(c.id)" matTooltip="Supprimer">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+
+        <div class="empty-msg" *ngIf="filteredComptesRendus.length === 0">
+          <mat-icon>folder_open</mat-icon>
+          <p>Aucun compte rendu trouvé.</p>
+          <button mat-raised-button class="add-btn" (click)="openForm()">
+            <mat-icon>add</mat-icon> Créer le premier
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

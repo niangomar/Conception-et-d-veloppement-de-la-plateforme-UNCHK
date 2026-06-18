@@ -1,0 +1,132 @@
+<div class="app-wrapper">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <img src="logoUnchk.png" alt="Logo" class="nav-logo">
+      <span class="nav-title">UN Cheikh Hamidou Kane</span>
+    </div>
+
+    <div class="menu-label">MENU ÉTUDIANT</div>
+    <a class="menu-item" routerLink="/dashboard-etudiant" routerLinkActive="active">
+      <mat-icon>home</mat-icon><span>Tableau de bord</span>
+    </a>
+    <a class="menu-item" routerLink="/emploi-du-temps" routerLinkActive="active">
+      <mat-icon>calendar_today</mat-icon><span>Emploi du temps</span>
+    </a>
+    <a class="menu-item" routerLink="/mes-devoirs" routerLinkActive="active">
+      <mat-icon>assignment</mat-icon><span>Mes devoirs</span>
+    </a>
+    <a class="menu-item" routerLink="/examens-etudiant" routerLinkActive="active">
+      <mat-icon>quiz</mat-icon><span>Examens</span>
+    </a>
+    <a class="menu-item" routerLink="/mes-documents" routerLinkActive="active">
+      <mat-icon>description</mat-icon><span>Mes documents</span>
+    </a>
+    <a class="menu-item" routerLink="/annonces" routerLinkActive="active">
+      <mat-icon>campaign</mat-icon><span>Annonces</span>
+    </a>
+    <a class="menu-item" routerLink="/mon-profil" routerLinkActive="active">
+      <mat-icon>person</mat-icon><span>Mon profil</span>
+    </a>
+
+    <div class="sidebar-footer">
+      <div class="year-badge">
+        <mat-icon>school</mat-icon>
+        <div>
+          <small>Année universitaire</small>
+          <strong>2025 - 2026</strong>
+        </div>
+      </div>
+      <a class="menu-item logout" routerLink="/login">
+        <mat-icon>logout</mat-icon><span>Déconnexion</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Contenu -->
+  <div class="main-content">
+    <div class="topbar">
+      <h2>Emploi du temps</h2>
+      <div class="topbar-right">
+        <div class="notif-btn">
+          <mat-icon>notifications</mat-icon>
+          <span class="badge">3</span>
+        </div>
+        <div class="user-info">
+          <div class="avatar">{{ prenomUtilisateur[0] }}{{ nomUtilisateur[0] }}</div>
+          <span>{{ prenomUtilisateur }} {{ nomUtilisateur }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="body-content">
+      <div class="welcome">
+        <h1>Emploi du temps</h1>
+        <p>Semestre en cours — 2025/2026</p>
+      </div>
+
+      <!-- Navigation semaine -->
+      <div class="semaine-nav">
+        <button (click)="semainePrecedente()">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <span>{{ labelSemaine }}</span>
+        <button (click)="semaineActuelle()">Aujourd'hui</button>
+        <button (click)="semaineSuivante()">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+
+      <!-- Chargement -->
+      @if (loading) {
+      <div class="loading">
+        <mat-icon class="spin">autorenew</mat-icon> Chargement...
+      </div>
+      }
+
+      <!-- Erreur -->
+      @if (erreur) {
+      <div class="erreur-msg">
+        <mat-icon>error_outline</mat-icon> {{ erreur }}
+      </div>
+      }
+
+      <!-- Grille semaine -->
+      @if (!loading && emploiDuTemps.length > 0) {
+      <div class="semaine-grid">
+        @for (jour of jours; track jour) {
+        <div class="jour-col">
+          <div class="jour-header">{{ jour }}</div>
+          <div class="cours-list">
+
+            @if (getCoursParJour(jour).length > 0) {
+            @for (c of getCoursParJour(jour); track c.heure) {
+            <div class="cours-card" [ngClass]="c.color">
+              <div class="cours-heure">{{ c.heure }}</div>
+              <div class="cours-nom">{{ c.cours }}</div>
+              <div class="cours-salle">
+                <mat-icon>room</mat-icon> {{ c.salle }}
+              </div>
+            </div>
+            }
+            } @else {
+            <div class="cours-vide">Pas de cours</div>
+            }
+
+          </div>
+        </div>
+        }
+      </div>
+      }
+
+      <!-- Aucun cours cette semaine -->
+      @if (!loading && emploiDuTemps.length === 0) {
+      <div class="cours-vide-semaine">
+        <mat-icon>event_busy</mat-icon>
+        <p>Aucun cours cette semaine.</p>
+      </div>
+      }
+
+    </div>
+  </div>
+</div>

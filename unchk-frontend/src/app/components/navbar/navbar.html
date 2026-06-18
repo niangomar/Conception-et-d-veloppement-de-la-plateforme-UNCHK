@@ -1,0 +1,60 @@
+<mat-toolbar class="navbar">
+  <div class="navbar-left">
+    <img src="logoUnchk.png" alt="Logo" class="nav-logo">
+    <span class="nav-title">UN Cheikh Hamidou Kane</span>
+  </div>
+
+  <div class="navbar-right">
+
+    <!-- CLOCHE NOTIFICATIONS -->
+    <div class="notif-btn" (click)="toggleNotifications()">
+      <mat-icon>notifications</mat-icon>
+      <span class="notif-badge" *ngIf="notifNonLues > 0">{{ notifNonLues }}</span>
+
+      <div class="notif-dropdown" *ngIf="showNotifications" (click)="$event.stopPropagation()">
+        <div class="notif-header">
+          <span>Notifications</span>
+          <button class="mark-all-btn" (click)="marquerToutLu()">Tout marquer lu</button>
+        </div>
+
+        <div class="notif-list">
+          <div
+            class="notif-item"
+            *ngFor="let n of notifications"
+            [class.non-lu]="!n.lu"
+            (click)="marquerLu(n.id)">
+            <div class="notif-icon" [class]="n.color">
+              <mat-icon>{{ n.icon }}</mat-icon>
+            </div>
+            <div class="notif-content">
+              <strong>{{ n.titre }}</strong>
+              <p>{{ n.message }}</p>
+              <small>{{ n.temps }}</small>
+            </div>
+            <button class="notif-close" (click)="supprimerNotif(n.id, $event)">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+
+          <div class="notif-empty" *ngIf="notifications.length === 0">
+            <mat-icon>notifications_none</mat-icon>
+            <p>Aucune notification</p>
+          </div>
+        </div>
+
+        <div class="notif-footer">
+          <a>Voir toutes les notifications →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-info">
+      <mat-icon class="admin-icon">account_circle</mat-icon>
+      <span class="user-name">Admin</span>
+    </div>
+
+    <button mat-icon-button title="Déconnexion">
+      <mat-icon>logout</mat-icon>
+    </button>
+  </div>
+</mat-toolbar>

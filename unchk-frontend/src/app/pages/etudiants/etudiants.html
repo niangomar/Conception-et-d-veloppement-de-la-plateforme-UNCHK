@@ -1,0 +1,356 @@
+<div class="dashboard-wrapper">
+
+  <!-- NAVBAR -->
+  <mat-toolbar class="navbar">
+    <div class="navbar-left">
+      <img src="logoUnchk.png" alt="Logo" class="nav-logo">
+      <span class="nav-title">UN Cheikh Hamidou Kane</span>
+    </div>
+    <div class="navbar-right">
+      <button mat-icon-button><mat-icon>notifications</mat-icon></button>
+      <span class="user-name">Admin</span>
+      <button mat-icon-button routerLink="/login"><mat-icon>logout</mat-icon></button>
+    </div>
+  </mat-toolbar>
+
+  <div class="dashboard-container">
+
+    <!-- SIDEBAR -->
+    <!-- UNE SEULE LIGNE -->
+    <app-sidebar></app-sidebar>
+
+    <div class="main-content">
+
+      <!-- HEADER -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Gestion des Étudiants</h1>
+          <p class="page-subtitle">Liste de tous les étudiants inscrits</p>
+        </div>
+        <button mat-raised-button class="add-btn" (click)="openForm()">
+          <mat-icon>add</mat-icon> Ajouter un étudiant
+        </button>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon"><mat-icon>school</mat-icon></div>
+          <div><h2>{{ etudiants.length }}</h2><p>Total étudiants</p></div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon"><mat-icon>check_circle</mat-icon></div>
+          <div><h2>{{ getActifs() }}</h2><p>Actifs</p></div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon"><mat-icon>check_circle</mat-icon></div>
+          <div><h2>{{ getAvecFormation() }}</h2><p>Avec formation</p></div>
+        </div>
+        <div class="stat-card rouge">
+          <div class="stat-icon"><mat-icon>warning</mat-icon></div>
+          <div><h2>{{ getSansFormation() }}</h2><p>Sans formation</p></div>
+        </div>
+      </div>
+      <!-- RECHERCHE -->
+      <div class="search-bar">
+        <mat-icon>search</mat-icon>
+        <input type="text"
+               placeholder="Rechercher par nom, INE, formation..."
+               [(ngModel)]="searchText"
+               (input)="filterEtudiants()">
+      </div>
+
+      <!-- FORMULAIRE -->
+
+      <mat-card class="form-card" *ngIf="showForm">
+        <mat-card-content>
+          <h3>
+            <mat-icon>{{ editMode ? 'edit' : 'add_circle' }}</mat-icon>
+            {{ editMode ? 'Modifier' : 'Ajouter' }} un étudiant
+          </h3>
+          <!-- ✅ LISTE DES INSCRITS -->
+          <div class="inscrits-zone full-width">
+            <div class="inscrits-header">
+              <mat-icon>people</mat-icon>
+              <span>Choisir parmi les inscrits</span>
+              <button mat-stroked-button
+                      (click)="showInscrits = !showInscrits">
+                {{ showInscrits ? 'Masquer' : 'Voir les inscrits' }}
+                <mat-icon>{{ showInscrits ? 'expand_less' : 'expand_more' }}</mat-icon>
+              </button>
+            </div>
+
+            <!-- Liste -->
+            <div class="inscrits-list" *ngIf="showInscrits">
+              <div class="inscrit-item"
+                   *ngFor="let i of inscrits"
+                   (click)="selectionnerInscrit(i)">
+                <div class="inscrit-avatar">
+                  {{ i.prenom?.[0] }}{{ i.nom?.[0] }}
+                </div>
+                <div class="inscrit-info">
+                  <strong>{{ i.prenom }} {{ i.nom }}</strong>
+                  <small>{{ i.email }}</small>
+                </div>
+                <mat-icon class="inscrit-select">add_circle</mat-icon>
+              </div>
+
+              <!-- Vide -->
+              <div class="inscrits-empty" *ngIf="inscrits.length === 0">
+                <mat-icon>info</mat-icon>
+                <span>Aucun étudiant inscrit pour le moment</span>
+              </div>
+            </div>
+          </div>
+          <div class="form-grid">
+
+            <mat-form-field appearance="outline">
+              <mat-label>Nom</mat-label>
+              <input matInput [(ngModel)]="etudiant.nom">
+              <mat-icon matSuffix>person</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Prénom</mat-label>
+              <input matInput [(ngModel)]="etudiant.prenom">
+              <mat-icon matSuffix>person_outline</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>INE</mat-label>
+              <input matInput [(ngModel)]="etudiant.INE"
+                     placeholder="Ex: N02219020202">
+              <mat-icon matSuffix>badge</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Email</mat-label>
+              <input matInput [(ngModel)]="etudiant.email" type="email">
+              <mat-icon matSuffix>email</mat-icon>
+            </mat-form-field>
+
+            <!-- ✅ Après -->
+            <mat-form-field appearance="outline">
+              <mat-label>Genre</mat-label>
+              <mat-select [(ngModel)]="etudiant.genre" [compareWith]="compareString">
+                <mat-option value="">-- Choisir --</mat-option>
+                <mat-option *ngFor="let g of genres" [value]="g">{{ g }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Formation</mat-label>
+              <mat-select [(ngModel)]="etudiant.formation">
+                <mat-option *ngFor="let f of formations" [value]="f">{{ f }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Promo</mat-label>
+              <input matInput [(ngModel)]="etudiant.promo"
+                     placeholder="Ex: 2024-2027">
+              <mat-icon matSuffix>groups</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Statut</mat-label>
+              <mat-select [(ngModel)]="etudiant.statut">
+                <mat-option *ngFor="let s of statuts" [value]="s">{{ s }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Date de naissance</mat-label>
+              <input matInput [matDatepicker]="picker"
+                     [(ngModel)]="etudiant.dateNaissance"
+                     placeholder="JJ/MM/AAAA">
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker startView="multi-year"></mat-datepicker>
+            </mat-form-field>
+
+
+            <mat-form-field appearance="outline">
+              <mat-label>Téléphone</mat-label>
+              <input matInput [(ngModel)]="etudiant.telephone"
+                     placeholder="77 000 00 00">
+              <mat-icon matSuffix>phone</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Adresse</mat-label>
+              <input matInput [(ngModel)]="etudiant.adresse"
+                     [matAutocomplete]="autoAdresse"
+                     placeholder="Quartier, Ville">
+              <mat-autocomplete #autoAdresse="matAutocomplete">
+                <mat-option *ngFor="let q of quartiers" [value]="q">{{ q }}</mat-option>
+              </mat-autocomplete>
+              <mat-icon matSuffix>location_on</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Année début</mat-label>
+              <input matInput type="number" [(ngModel)]="etudiant.anneeDebut"
+                     placeholder="2024">
+              <mat-icon matSuffix>calendar_today</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Année sortie</mat-label>
+              <input matInput type="number" [(ngModel)]="etudiant.anneeSortie"
+                     placeholder="2027">
+              <mat-icon matSuffix>calendar_month</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Diplômes</mat-label>
+              <textarea matInput [(ngModel)]="etudiant.diplomes"
+                        placeholder="Ex: Bac S, Licence Informatique..."
+                        rows="2"></textarea>
+              <mat-icon matSuffix>workspace_premium</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Autres formations</mat-label>
+              <textarea matInput [(ngModel)]="etudiant.autresFormations"
+                        placeholder="Ex: Certification AWS, CCNA..."
+                        rows="2"></textarea>
+              <mat-icon matSuffix>add_circle</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Niveau</mat-label>
+              <mat-select [(ngModel)]="etudiant.niveau">
+                <mat-option *ngFor="let n of niveaux" [value]="n">{{ n }}</mat-option>
+              </mat-select>
+              <mat-icon matSuffix>grade</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <div class="form-actions">
+            <button mat-button (click)="showForm = false">Annuler</button>
+            <button mat-raised-button class="add-btn" (click)="saveEtudiant()">
+              <mat-icon>save</mat-icon>
+              {{ editMode ? 'Modifier' : 'Enregistrer' }}
+            </button>
+          </div>
+
+        </mat-card-content>
+      </mat-card>
+
+      <!-- CARDS ÉTUDIANTS -->
+      <div class="etudiants-grid">
+
+        <mat-card class="etudiant-card" *ngFor="let e of filteredEtudiants">
+          <mat-card-content>
+
+            <div class="card-header">
+              <div class="avatar">{{ e.prenom?.[0] }}{{ e.nom?.[0] }}</div>
+              <div class="card-actions">
+                <button mat-icon-button color="primary"
+                        (click)="editEtudiant(e)"
+                        matTooltip="Modifier">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn"
+                        (click)="deleteEtudiant(e.id)"
+                        matTooltip="Supprimer">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <h3 class="etudiant-nom">{{ e.prenom }} {{ e.nom }}</h3>
+
+            <div class="ine-badge">
+              <mat-icon>badge</mat-icon>
+              {{ e.INE || e.ine || 'INE non défini' }}
+            </div>
+
+            <div class="etudiant-infos">
+
+              <div class="info-item" *ngIf="e.formation">
+                <mat-icon>school</mat-icon>
+                <span>{{ e.formation }} — {{ e.promo }}</span>
+              </div>
+              <!-- ✅ AJOUTE CES 2 LIGNES ICI -->
+              <div class="info-item" *ngIf="e.niveau">
+                <mat-icon>grade</mat-icon>
+                <span>Niveau : {{ e.niveau }}</span>
+              </div>
+
+              <div class="info-item" *ngIf="e.email">
+                <mat-icon>email</mat-icon>
+                <span>{{ e.email }}</span>
+              </div>
+
+              <div class="info-item" *ngIf="e.telephone">
+                <mat-icon>phone</mat-icon>
+                <span>{{ e.telephone }}</span>
+              </div>
+
+              <div class="info-item" *ngIf="e.adresse">
+                <mat-icon>location_on</mat-icon>
+                <span>{{ e.adresse }}</span>
+              </div>
+
+              <div class="info-item" *ngIf="e.dateNaissance">
+                <mat-icon>cake</mat-icon>
+                <span>{{ e.dateNaissance | date:'dd/MM/yyyy' }}</span>
+              </div>
+              <div class="info-item" *ngIf="e.genre">
+                <mat-icon>wc</mat-icon>
+                <span>{{ e.genre }}</span>
+              </div>
+
+              <div class="info-item" *ngIf="e.anneeDebut">
+                <mat-icon>calendar_today</mat-icon>
+                <span>{{ e.anneeDebut }} — {{ e.anneeSortie || '...' }}</span>
+              </div>
+
+              <div class="info-item" *ngIf="e.diplomes">
+                <mat-icon>workspace_premium</mat-icon>
+                <span>{{ e.diplomes }}</span>
+              </div>
+
+            </div>
+
+            <div class="card-footer">
+  <span class="statut-badge" [ngClass]="getStatutClass(e.statut)">
+    <mat-icon>{{ getStatutIcon(e.statut) }}</mat-icon>
+    {{ e.statut || 'Actif' }}
+  </span>
+
+              <!-- ✅ Si pas de formation → menu pour assigner -->
+              <div class="assigner-zone" *ngIf="!e.formation">
+                <mat-icon style="color:#F57C00">warning</mat-icon>
+                <select class="assigner-select"
+                        (change)="assignerFormation(e, $any($event.target).value)">
+                  <option value="">Assigner formation...</option>
+                  <option *ngFor="let f of formations" [value]="f">{{ f }}</option>
+                </select>
+              </div>
+
+              <!-- ✅ Si formation assignée → badge -->
+              <span class="formation-badge" *ngIf="e.formation">
+    <mat-icon>school</mat-icon>
+    {{ e.formation }}
+  </span>
+
+            </div>
+
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Message si vide -->
+        <div class="empty-msg" *ngIf="filteredEtudiants.length === 0">
+          <mat-icon>school</mat-icon>
+          <p>Aucun étudiant trouvé.</p>
+          <button mat-raised-button class="add-btn" (click)="openForm()">
+            <mat-icon>add</mat-icon> Ajouter le premier
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

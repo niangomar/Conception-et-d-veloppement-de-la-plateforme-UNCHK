@@ -1,0 +1,415 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: #e8edf2;
+  overflow: hidden; /* supprime la barre de défilement */
+}
+
+.login-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  width: 95vw;
+  max-width: 1150px;
+  height: 96vh;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+
+/* ── GAUCHE ─────────────────────────────────────────── */
+.login-left {
+  flex: 1;
+  position: relative;
+  background-image: url('/siege.png');
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg,
+    rgba(10,30,70,0.72) 0%,
+    rgba(33,150,243,0.65) 100%);
+}
+
+.left-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 28px;
+  color: white;
+  justify-content: space-between;
+}
+
+.logo-container {
+  background: white;
+  border-radius: 14px;
+  padding: 8px;
+  width: 78px;
+  height: 78px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+  flex-shrink: 0;
+}
+
+.logo { width: 62px; object-fit: contain; }
+
+.left-text { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+
+.left-text h1 {
+  font-size: 2rem;
+  font-weight: 900;
+  margin-bottom: 4px;
+}
+
+.left-text h2 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  opacity: 0.95;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.left-divider {
+  width: 40px;
+  height: 3px;
+  background: #FFD700;
+  border-radius: 2px;
+  margin-bottom: 8px;
+}
+
+.left-text p {
+  font-size: 0.80rem;
+  opacity: 0.88;
+  max-width: 280px;
+  line-height: 1.5;
+}
+
+.left-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+
+.left-stat {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 10px;
+  padding: 8px 4px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.left-stat mat-icon { font-size: 16px; width: 16px; height: 16px; }
+.left-stat strong   { font-size: 0.95rem; font-weight: 800; }
+.left-stat small    { font-size: 0.62rem; opacity: 0.85; }
+
+.bottom-card {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  padding: 9px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  flex-shrink: 0;
+}
+
+.bottom-card mat-icon { color: #90CAF9; flex-shrink: 0; }
+.bottom-card strong   { font-size: 0.80rem; display: block; margin-bottom: 2px; }
+.bottom-card small    { font-size: 0.68rem; opacity: 0.8; }
+
+/* ── DROITE ─────────────────────────────────────────── */
+.login-right {
+  flex: 1;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* pas de scrollbar */
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 8px 16px;
+  flex-shrink: 0;
+}
+
+.lang-selector {
+  color: #555;
+  font-size: 0.82rem;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid #ddd;
+  background: #fafafa;
+}
+
+.icon-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #fafafa;
+  border: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #555;
+}
+
+.icon-btn mat-icon { font-size: 15px; width: 15px; height: 15px; }
+
+.form-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 30px 10px;
+  overflow: hidden; /* pas de scrollbar */
+}
+
+.form-card { width: 100%; max-width: 390px; }
+
+.form-icon {
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(135deg, #1565C0, #2196F3);
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 7px;
+  box-shadow: 0 6px 20px rgba(33,150,243,0.35);
+}
+
+.form-icon mat-icon { color: white; font-size: 20px; width: 20px; height: 20px; }
+
+.form-card h2 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #1a3a5c;
+  text-align: center;
+  margin-bottom: 2px;
+}
+
+.subtitle {
+  color: #888;
+  text-align: center;
+  margin-bottom: 12px;
+  font-size: 0.80rem;
+}
+
+/* ── INPUTS ──────────────────────────────────────────── */
+.input-group { margin-bottom: 9px; }
+
+.input-group label {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #444;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.input-wrap {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 0 12px;
+  background: #fafafa;
+  transition: all 0.2s;
+}
+
+.input-wrap:focus-within {
+  border-color: #2196F3;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(33,150,243,0.12);
+}
+
+.input-icon {
+  color: #bbb;
+  font-size: 15px !important;
+  width: 15px !important;
+  height: 15px !important;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.input-suffix {
+  color: #bbb;
+  font-size: 15px !important;
+  width: 15px !important;
+  height: 15px !important;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.input-wrap input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 9px 0;
+  font-size: 0.86rem;
+  color: #333;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* ── REMEMBER ────────────────────────────────────────── */
+.remember-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 0.76rem;
+  color: #666;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.forgot {
+  color: #2196F3;
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* ── BOUTON ──────────────────────────────────────────── */
+.login-btn {
+  width: 100%;
+  height: 42px;
+  background: linear-gradient(135deg, #1a3a5c, #2196F3);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 15px rgba(33,150,243,0.35);
+}
+
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(33,150,243,0.45);
+}
+
+/* ── DIVIDER ─────────────────────────────────────────── */
+.divider {
+  text-align: center;
+  color: #ccc;
+  margin: 3px 0 9px;
+  font-size: 0.76rem;
+  position: relative;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 38%;
+  height: 1px;
+  background: #eee;
+}
+
+.divider::before { left: 0; }
+.divider::after  { right: 0; }
+
+/* ── CARTES RÔLES ────────────────────────────────────── */
+.role-cards {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.role-card {
+  flex: 1;
+  border: 2px solid #f0f0f0;
+  border-radius: 12px;
+  padding: 10px 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: white;
+}
+
+.role-card mat-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.role-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+
+.role-card:nth-child(1):hover { border-color: #2196F3; background: #f0f8ff; }
+.role-card:nth-child(2):hover { border-color: #4CAF50; background: #f0fff4; }
+.role-card:nth-child(3):hover { border-color: #F44336; background: #fff0f0; }
+
+.role-name {
+  font-weight: 700;
+  font-size: 0.82rem;
+}
+
+.role-name.etudiant  { color: #2196F3; }
+.role-name.formateur { color: #4CAF50; }
+.role-name.admin     { color: #F44336; }
+
+.role-desc {
+  font-size: 0.68rem;
+  color: #999;
+}
+
+/* ── SIGNUP ──────────────────────────────────────────── */
+.signup-link {
+  text-align: center;
+  color: #888;
+  font-size: 0.78rem;
+}
+
+.signup-link a {
+  color: #2196F3;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.signup-link a:hover { text-decoration: underline; }

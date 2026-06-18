@@ -1,0 +1,333 @@
+<div class="app-wrapper">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <img src="logoUnchk.png" alt="Logo" class="nav-logo">
+      <span class="nav-title">UN Cheikh Hamidou Kane</span>
+    </div>
+
+    <!-- Menu Étudiant -->
+    <ng-container *ngIf="isEtudiant()">
+      <div class="menu-label">MENU ÉTUDIANT</div>
+      <a class="menu-item" routerLink="/dashboard-etudiant" routerLinkActive="active">
+        <mat-icon>home</mat-icon><span>Tableau de bord</span>
+      </a>
+      <a class="menu-item" routerLink="/emploi-du-temps" routerLinkActive="active">
+        <mat-icon>calendar_today</mat-icon><span>Emploi du temps</span>
+      </a>
+      <a class="menu-item" routerLink="/mes-devoirs" routerLinkActive="active">
+        <mat-icon>assignment</mat-icon><span>Mes devoirs</span>
+      </a>
+      <a class="menu-item" routerLink="/examens-etudiant" routerLinkActive="active">
+        <mat-icon>quiz</mat-icon><span>Examens</span>
+      </a>
+      <a class="menu-item" routerLink="/mes-documents" routerLinkActive="active">
+        <mat-icon>description</mat-icon><span>Mes documents</span>
+      </a>
+      <a class="menu-item" routerLink="/annonces" routerLinkActive="active">
+        <mat-icon>campaign</mat-icon><span>Annonces</span>
+      </a>
+      <a class="menu-item active" routerLink="/mon-profil" routerLinkActive="active">
+        <mat-icon>person</mat-icon><span>Mon profil</span>
+      </a>
+    </ng-container>
+
+    <!-- Menu Formateur -->
+    <ng-container *ngIf="isFormateur()">
+      <div class="menu-label">MENU FORMATEUR</div>
+      <a class="menu-item" routerLink="/dashboard-formateur" routerLinkActive="active">
+        <mat-icon>home</mat-icon><span>Tableau de bord</span>
+      </a>
+      <a class="menu-item" routerLink="/mes-cours" routerLinkActive="active">
+        <mat-icon>menu_book</mat-icon><span>Mes cours</span>
+      </a>
+      <a class="menu-item" routerLink="/emploi-du-temps-formateur" routerLinkActive="active">
+        <mat-icon>calendar_today</mat-icon><span>Emploi du temps</span>
+      </a>
+      <a class="menu-item" routerLink="/mes-etudiants" routerLinkActive="active">
+        <mat-icon>groups</mat-icon><span>Mes étudiants</span>
+      </a>
+      <a class="menu-item" routerLink="/devoirs-formateur" routerLinkActive="active">
+        <mat-icon>assignment</mat-icon><span>Devoirs & Examens</span>
+      </a>
+      <a class="menu-item" routerLink="/documents-formateur" routerLinkActive="active">
+        <mat-icon>upload_file</mat-icon><span>Déposer documents</span>
+      </a>
+      <a class="menu-item" routerLink="/annonces-formateur" routerLinkActive="active">
+        <mat-icon>campaign</mat-icon><span>Annonces</span>
+      </a>
+      <a class="menu-item active" routerLink="/mon-profil" routerLinkActive="active">
+        <mat-icon>person</mat-icon><span>Mon profil</span>
+      </a>
+    </ng-container>
+
+    <!-- Menu par défaut (admin / autres) -->
+    <ng-container *ngIf="!isEtudiant() && !isFormateur()">
+      <div class="menu-label">MENU</div>
+      <a class="menu-item" routerLink="/dashboard" routerLinkActive="active">
+        <mat-icon>home</mat-icon><span>Tableau de bord</span>
+      </a>
+      <a class="menu-item active" routerLink="/mon-profil" routerLinkActive="active">
+        <mat-icon>person</mat-icon><span>Mon profil</span>
+      </a>
+    </ng-container>
+
+    <div class="sidebar-footer">
+      <div class="year-badge">
+        <mat-icon>school</mat-icon>
+        <div>
+          <small>Année universitaire</small>
+          <strong>2025 - 2026</strong>
+        </div>
+      </div>
+      <a class="menu-item logout" routerLink="/login">
+        <mat-icon>logout</mat-icon><span>Déconnexion</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Contenu principal -->
+  <div class="main-content">
+    <div class="topbar">
+      <h2>Mon profil</h2>
+      <div class="topbar-right">
+        <div class="notif-btn">
+          <mat-icon>notifications</mat-icon>
+          <span class="badge">3</span>
+        </div>
+        <div class="user-info" *ngIf="utilisateur">
+          <div class="avatar">{{ getInitiales() }}</div>
+          <span>{{ utilisateur.prenom }} {{ utilisateur.nom }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="body-content">
+
+      <!-- Chargement -->
+      <div class="loading" *ngIf="chargement">
+        <mat-icon>hourglass_empty</mat-icon>
+        <p>Chargement du profil...</p>
+      </div>
+
+      <ng-container *ngIf="!chargement && utilisateur">
+        <div class="welcome">
+          <h1>👤 Mon profil</h1>
+          <p>Vos informations personnelles</p>
+        </div>
+
+        <!-- Carte profil principale -->
+        <div class="profil-hero">
+          <div class="avatar-grand">{{ getInitiales() }}</div>
+          <div class="profil-hero-info">
+            <h2>{{ utilisateur.prenom }} {{ utilisateur.nom }}</h2>
+            <span class="role-badge" [ngClass]="getRoleClass()">
+              {{ getRoleLabel() }}
+            </span>
+            <p class="email-hero">
+              <mat-icon>email</mat-icon>
+              {{ utilisateur.email }}
+            </p>
+          </div>
+          <div class="statut-hero">
+            <span class="actif-badge" [ngClass]="utilisateur.actif ? 'actif' : 'inactif'">
+              <mat-icon>{{ utilisateur.actif ? 'check_circle' : 'cancel' }}</mat-icon>
+              {{ utilisateur.actif ? 'Compte actif' : 'Compte inactif' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- ── INFOS ÉTUDIANT ─────────────────────────────── -->
+        <div class="etudiant-section" *ngIf="isEtudiant() && etudiant">
+          <h3 class="section-title">
+            <mat-icon>school</mat-icon>
+            Informations académiques
+          </h3>
+
+          <div class="info-grid">
+            <div class="info-item" *ngIf="etudiant.INE">
+              <mat-icon>badge</mat-icon>
+              <div><small>INE</small><strong>{{ etudiant.INE }}</strong></div>
+            </div>
+            <div class="info-item" *ngIf="etudiant.formation">
+              <mat-icon>book</mat-icon>
+              <div><small>Formation</small><strong>{{ etudiant.formation }}</strong></div>
+            </div>
+            <div class="info-item" *ngIf="etudiant.niveau">
+              <mat-icon>grade</mat-icon>
+              <div><small>Niveau</small><strong>{{ etudiant.niveau }}</strong></div>
+            </div>
+            <div class="info-item" *ngIf="etudiant.promo">
+              <mat-icon>groups</mat-icon>
+              <div><small>Promotion</small><strong>{{ etudiant.promo }}</strong></div>
+            </div>
+            <div class="info-item" *ngIf="etudiant.statut">
+              <mat-icon>check_circle</mat-icon>
+              <div><small>Statut</small><strong>{{ etudiant.statut }}</strong></div>
+            </div>
+            <div class="info-item" *ngIf="etudiant.anneeDebut">
+              <mat-icon>calendar_today</mat-icon>
+              <div><small>Années</small><strong>{{ etudiant.anneeDebut }} — {{ etudiant.anneeSortie || '...' }}</strong></div>
+            </div>
+            <div class="info-item" *ngIf="etudiant.diplomes">
+              <mat-icon>workspace_premium</mat-icon>
+              <div><small>Diplômes</small><strong>{{ etudiant.diplomes }}</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="no-formation" *ngIf="isEtudiant() && !etudiant?.formation">
+          <mat-icon>warning</mat-icon>
+          <p>Aucune formation assignée pour le moment.</p>
+          <small>Contactez l'administration pour plus d'informations.</small>
+        </div>
+
+        <!-- ── INFOS FORMATEUR ────────────────────────────── -->
+        <div class="etudiant-section" *ngIf="isFormateur() && formateur">
+          <h3 class="section-title">
+            <mat-icon>menu_book</mat-icon>
+            Informations professionnelles
+          </h3>
+
+          <div class="info-grid">
+            <div class="info-item" *ngIf="formateur.specialite">
+              <mat-icon>school</mat-icon>
+              <div><small>Spécialité</small><strong>{{ formateur.specialite }}</strong></div>
+            </div>
+            <div class="info-item" *ngIf="formateur.grade">
+              <mat-icon>military_tech</mat-icon>
+              <div><small>Grade</small><strong>{{ formateur.grade }}</strong></div>
+            </div>
+            <div class="info-item" *ngIf="formateur.telephone">
+              <mat-icon>phone</mat-icon>
+              <div><small>Téléphone</small><strong>{{ formateur.telephone }}</strong></div>
+            </div>
+            <div class="info-item" *ngIf="formateur.statut">
+              <mat-icon>check_circle</mat-icon>
+              <div><small>Statut</small><strong>{{ formateur.statut }}</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="no-formation" *ngIf="isFormateur() && !formateur">
+          <mat-icon>warning</mat-icon>
+          <p>Profil formateur non encore renseigné.</p>
+          <small>Contactez l'administration pour plus d'informations.</small>
+        </div>
+
+        <!-- Infos détaillées -->
+        <div class="infos-grid">
+
+          <div class="card">
+            <div class="card-header">
+              <h3><mat-icon>person</mat-icon> Informations personnelles</h3>
+            </div>
+            <div class="info-list">
+              <div class="info-row">
+                <span class="info-label"><mat-icon>badge</mat-icon> Nom complet</span>
+                <span class="info-value">{{ utilisateur.prenom }} {{ utilisateur.nom }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label"><mat-icon>email</mat-icon> Email</span>
+                <span class="info-value">{{ utilisateur.email }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label"><mat-icon>work</mat-icon> Rôle</span>
+                <span class="info-value">
+                  <span class="role-badge" [ngClass]="getRoleClass()">{{ getRoleLabel() }}</span>
+                </span>
+              </div>
+              <div class="info-row">
+                <span class="info-label"><mat-icon>toggle_on</mat-icon> Statut</span>
+                <span class="info-value">
+                  <span class="actif-badge" [ngClass]="utilisateur.actif ? 'actif' : 'inactif'">
+                    {{ utilisateur.actif ? 'Actif' : 'Inactif' }}
+                  </span>
+                </span>
+              </div>
+              <div class="info-row">
+                <span class="info-label"><mat-icon>calendar_today</mat-icon> Inscrit le</span>
+                <span class="info-value">{{ formaterDate(utilisateur.createdAt) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Carte académique : étudiant -->
+          <div class="card" *ngIf="isEtudiant()">
+            <div class="card-header">
+              <h3><mat-icon>school</mat-icon> Informations académiques</h3>
+            </div>
+            <div class="info-list">
+              <div class="info-row">
+                <span class="info-label"><mat-icon>domain</mat-icon> Établissement</span>
+                <span class="info-value">UN Cheikh Hamidou Kane</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label"><mat-icon>calendar_month</mat-icon> Année universitaire</span>
+                <span class="info-value">2025 - 2026</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label"><mat-icon>menu_book</mat-icon> Cours inscrits</span>
+                <span class="info-value">4 cours</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label"><mat-icon>trending_up</mat-icon> Moyenne générale</span>
+                <span class="info-value moyenne">12,5 / 20</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Carte académique : formateur -->
+          <div class="card" *ngIf="isFormateur()">
+            <div class="card-header">
+              <h3><mat-icon>school</mat-icon> Informations professionnelles</h3>
+            </div>
+            <div class="info-list">
+              <div class="info-row">
+                <span class="info-label"><mat-icon>domain</mat-icon> Établissement</span>
+                <span class="info-value">UN Cheikh Hamidou Kane</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label"><mat-icon>calendar_month</mat-icon> Année universitaire</span>
+                <span class="info-value">2025 - 2026</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label"><mat-icon>menu_book</mat-icon> Cours dispensés</span>
+                <span class="info-value">3 cours</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label"><mat-icon>groups</mat-icon> Étudiants encadrés</span>
+                <span class="info-value">87 étudiants</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Sécurité -->
+        <div class="card">
+          <div class="card-header">
+            <h3><mat-icon>security</mat-icon> Sécurité</h3>
+          </div>
+          <div class="securite-info">
+            <div class="securite-item">
+              <div class="securite-icon blue"><mat-icon>lock</mat-icon></div>
+              <div>
+                <strong>Mot de passe</strong>
+                <p>Pour changer votre mot de passe, contactez l'administration</p>
+              </div>
+            </div>
+            <div class="securite-item">
+              <div class="securite-icon green"><mat-icon>verified_user</mat-icon></div>
+              <div>
+                <strong>Compte vérifié</strong>
+                <p>Votre compte a été vérifié par l'administration</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </ng-container>
+    </div>
+  </div>
+</div>

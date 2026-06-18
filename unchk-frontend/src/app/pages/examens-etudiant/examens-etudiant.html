@@ -1,0 +1,314 @@
+<div class="app-wrapper">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <img src="logoUnchk.png" alt="Logo" class="nav-logo">
+      <span class="nav-title">UN Cheikh Hamidou Kane</span>
+    </div>
+
+    <div class="menu-label">MENU ETUDIANT</div>
+
+    <a class="menu-item" routerLink="/dashboard-etudiant" routerLinkActive="active">
+      <mat-icon>home</mat-icon><span>Tableau de bord</span>
+    </a>
+    <a class="menu-item" routerLink="/emploi-du-temps" routerLinkActive="active">
+      <mat-icon>calendar_today</mat-icon><span>Emploi du temps</span>
+    </a>
+    <a class="menu-item" routerLink="/mes-devoirs" routerLinkActive="active">
+      <mat-icon>assignment</mat-icon><span>Mes devoirs</span>
+    </a>
+    <a class="menu-item" routerLink="/examens-etudiant" routerLinkActive="active">
+      <mat-icon>quiz</mat-icon><span>Examens</span>
+    </a>
+    <a class="menu-item" routerLink="/mes-documents" routerLinkActive="active">
+      <mat-icon>description</mat-icon><span>Mes documents</span>
+    </a>
+    <a class="menu-item" routerLink="/annonces" routerLinkActive="active">
+      <mat-icon>campaign</mat-icon><span>Annonces</span>
+    </a>
+    <a class="menu-item" routerLink="/mon-profil" routerLinkActive="active">
+      <mat-icon>person</mat-icon><span>Mon profil</span>
+    </a>
+
+    <div class="sidebar-footer">
+      <div class="year-badge">
+        <mat-icon>school</mat-icon>
+        <div>
+          <small>Annee universitaire</small>
+          <strong>2025 - 2026</strong>
+        </div>
+      </div>
+      <a class="menu-item logout" routerLink="/login">
+        <mat-icon>logout</mat-icon><span>Deconnexion</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- CONTENU PRINCIPAL -->
+  <div class="main-content">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <h2>Examens</h2>
+      <div class="topbar-right">
+        <div class="notif-btn">
+          <mat-icon>notifications</mat-icon>
+          <span class="badge">3</span>
+        </div>
+        <div class="user-info">
+          <div class="avatar">{{ prenomUtilisateur[0] }}{{ nomUtilisateur[0] }}</div>
+          <span>{{ prenomUtilisateur }} {{ nomUtilisateur }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="body-content">
+
+      <div class="welcome">
+        <h1>Mes examens</h1>
+        <p>Session de Juin 2026</p>
+      </div>
+
+      <!-- BANDEAU MINUTERIE -->
+      @if (testActif) {
+      <div class="timer-bandeau" [ngClass]="couleurTimer">
+        <div class="timer-left">
+          <mat-icon class="timer-icon">timer</mat-icon>
+          <div class="timer-info">
+            <span class="timer-label">Epreuve en cours</span>
+            <strong class="timer-matiere">{{ testActif.matiere }}</strong>
+          </div>
+        </div>
+
+        <div class="timer-center">
+          <div class="timer-display" [ngClass]="couleurTimer">
+            <span class="timer-digit">{{ heures }}</span>
+            <span class="timer-sep">:</span>
+            <span class="timer-digit">{{ minutes }}</span>
+            <span class="timer-sep">:</span>
+            <span class="timer-digit">{{ secondes }}</span>
+          </div>
+          <div class="timer-progress-bar">
+            <div
+              class="timer-progress-fill"
+              [ngClass]="couleurTimer"
+              [style.width.%]="pourcentageRestant">
+            </div>
+          </div>
+          <small class="timer-hint">Temps restant</small>
+        </div>
+
+        <div class="timer-right">
+          <button class="btn-terminer" (click)="demanderTerminer()">
+            <mat-icon>send</mat-icon>
+            Terminer le test
+          </button>
+        </div>
+      </div>
+      }
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon"><mat-icon>quiz</mat-icon></div>
+          <div class="stat-info">
+            <h2>{{ nbTotal }}</h2>
+            <p>Examens</p>
+            <small>ce semestre</small>
+          </div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon"><mat-icon>schedule</mat-icon></div>
+          <div class="stat-info">
+            <h2>{{ joursAvantPremier }}</h2>
+            <p>Jours</p>
+            <small>avant le 1er examen</small>
+          </div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon"><mat-icon>check_circle</mat-icon></div>
+          <div class="stat-info">
+            <h2>{{ nbPasses }}</h2>
+            <p>Passes</p>
+            <small>ce semestre</small>
+          </div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-icon"><mat-icon>pending</mat-icon></div>
+          <div class="stat-info">
+            <h2>{{ nbAVenir }}</h2>
+            <p>A venir</p>
+            <small>ce semestre</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Calendrier des examens -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Calendrier des examens</h3>
+        </div>
+
+        <div class="examens-list">
+          @for (e of examens; track e.matiere) {
+          <div class="examen-item" [ngClass]="{'examen-actif': testActif === e}">
+
+            <!-- Date -->
+            <div class="examen-date" [ngClass]="e.color">
+              <strong>{{ e.jour }}</strong>
+              <small>{{ e.mois }}</small>
+            </div>
+
+            <!-- Infos -->
+            <div class="examen-info">
+              <strong>{{ e.matiere }}</strong>
+              <div class="examen-details">
+                <span><mat-icon>access_time</mat-icon> {{ e.heure }}</span>
+                <span><mat-icon>room</mat-icon> {{ e.salle }}</span>
+                <span><mat-icon>hourglass_empty</mat-icon> {{ e.dureeMinutes }} min</span>
+              </div>
+            </div>
+
+            <!-- Droite : badge + statut + bouton -->
+            <div class="examen-right">
+
+              @if (e.statut === 'a-venir') {
+              <span class="jours-badge" [ngClass]="e.color">
+                    Dans {{ e.jours }} jours
+                  </span>
+              }
+
+              @if (e.statut === 'en-cours') {
+              <span class="jours-badge badge-en-cours">
+                    En cours
+                  </span>
+              }
+
+              @if (e.statut === 'termine') {
+              <span class="jours-badge badge-termine">
+                    Termine
+                  </span>
+              }
+
+              @if (e.statut === 'passe') {
+              <span class="jours-badge badge-passe">
+                    Passe
+                  </span>
+              }
+
+              <!-- Statut texte -->
+              <span class="statut" [ngClass]="'statut-' + e.statut">
+                  @switch (e.statut) {
+                    @case ('a-venir') { A venir }
+                    @case ('en-cours') { En cours }
+                    @case ('termine') { Soumis }
+                    @case ('passe') { Passe }
+                  }
+                </span>
+
+              <!-- Bouton DEMARRER -->
+              @if (e.statut === 'en-cours' && testActif !== e && !testActif) {
+              <button class="btn-demarrer" (click)="demarrerTest(e)">
+                <mat-icon>play_arrow</mat-icon>
+                Demarrer le test
+              </button>
+              }
+
+              <!-- Indicateur test actif -->
+              @if (testActif === e) {
+              <div class="test-en-cours-badge">
+                <mat-icon>radio_button_checked</mat-icon>
+                Test en cours
+              </div>
+              }
+
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- Conseils -->
+      <div class="card conseils-card">
+        <div class="card-header">
+          <h3>Conseils de revision</h3>
+        </div>
+        <div class="conseils-grid">
+          <div class="conseil-item">
+            <div class="conseil-icon blue"><mat-icon>schedule</mat-icon></div>
+            <div>
+              <strong>Planifiez vos revisions</strong>
+              <p>Commencez au moins 2 semaines avant chaque examen</p>
+            </div>
+          </div>
+          <div class="conseil-item">
+            <div class="conseil-icon green"><mat-icon>group</mat-icon></div>
+            <div>
+              <strong>Travaillez en groupe</strong>
+              <p>Les revisions collectives ameliorent la memorisation</p>
+            </div>
+          </div>
+          <div class="conseil-item">
+            <div class="conseil-icon orange"><mat-icon>description</mat-icon></div>
+            <div>
+              <strong>Consultez les supports</strong>
+              <p>Telechargez les cours depuis la section Documents</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /body-content -->
+  </div><!-- /main-content -->
+
+</div><!-- /app-wrapper -->
+
+
+<!-- MODAL CONFIRMATION TERMINER -->
+@if (modalConfirmOuvert) {
+<div class="modal-overlay" (click)="annulerTerminer()">
+  <div class="modal" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h3><mat-icon>warning</mat-icon> Terminer le test ?</h3>
+      <button class="btn-close" (click)="annulerTerminer()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="modal-warning-icon">&#9888;</div>
+      <p class="modal-text">
+        Vous etes sur le point de soumettre votre epreuve
+        <strong>{{ testActif?.matiere }}</strong>.
+      </p>
+      <p class="modal-subtext">
+        Il vous reste encore
+        <strong class="time-left">{{ heures }}h {{ minutes }}min {{ secondes }}s</strong>.
+        Cette action est <strong>irreversible</strong>.
+      </p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="annulerTerminer()">
+        <mat-icon>arrow_back</mat-icon>
+        Continuer
+      </button>
+      <button class="btn-confirm-danger" (click)="confirmerTerminer()">
+        <mat-icon>send</mat-icon>
+        Oui, soumettre maintenant
+      </button>
+    </div>
+
+  </div>
+</div>
+}
+
+
+<!-- TOAST -->
+<div class="toast" [class.show]="toastVisible" [ngClass]="'toast-' + toastType">
+  <mat-icon>{{ toastType === 'success' ? 'check_circle' : 'timer_off' }}</mat-icon>
+  {{ toastMessage }}
+</div>

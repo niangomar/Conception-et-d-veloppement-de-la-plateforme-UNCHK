@@ -1,0 +1,142 @@
+<div class="login-wrapper">
+
+  <!-- ── CÔTÉ GAUCHE ──────────────────────────────── -->
+  <div class="login-left">
+    <div class="overlay"></div>
+    <div class="left-content">
+
+      <div class="logo-container">
+        <img src="logoUnchk.png" alt="Logo UNCHK" class="logo">
+      </div>
+
+      <div class="left-text">
+        <h1>Bienvenue !</h1>
+        <h2>Université Numérique<br>Cheikh Hamidou Kane</h2>
+        <div class="left-divider"></div>
+        <p>Une plateforme dédiée à l'excellence académique et à l'innovation pédagogique.</p>
+      </div>
+
+      <div class="left-stats">
+        <div class="left-stat">
+          <mat-icon>school</mat-icon>
+          <strong>1 245</strong>
+          <small>Étudiants</small>
+        </div>
+        <div class="left-stat">
+          <mat-icon>group</mat-icon>
+          <strong>87</strong>
+          <small>Formateurs</small>
+        </div>
+        <div class="left-stat">
+          <mat-icon>menu_book</mat-icon>
+          <strong>34</strong>
+          <small>Formations</small>
+        </div>
+        <div class="left-stat">
+          <mat-icon>emoji_events</mat-icon>
+          <strong>98%</strong>
+          <small>Satisfaction</small>
+        </div>
+      </div>
+
+      <div class="bottom-card">
+        <mat-icon>verified_user</mat-icon>
+        <div>
+          <strong>Connexion sécurisée</strong>
+          <small>Vos données sont protégées et confidentielles</small>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── CÔTÉ DROIT ───────────────────────────────── -->
+  <div class="login-right">
+    <div class="topbar-right">
+      <div class="lang-selector">🌐 Français ▾</div>
+      <div class="icon-btn"><mat-icon>dark_mode</mat-icon></div>
+      <div class="icon-btn"><mat-icon>help_outline</mat-icon></div>
+    </div>
+
+    <div class="form-wrapper">
+      <div class="form-card">
+
+        <div class="form-icon">
+          <mat-icon>lock</mat-icon>
+        </div>
+        <h2>Bon retour !</h2>
+        <p class="subtitle">Connectez-vous pour accéder à votre espace personnel</p>
+
+        <!-- Email -->
+        <div class="input-group">
+          <label>Adresse email</label>
+          <div class="input-wrap">
+            <mat-icon class="input-icon">email</mat-icon>
+            <input type="email"
+                   [(ngModel)]="email"
+                   placeholder="votre@unchk.sn">
+          </div>
+        </div>
+
+        <!-- Mot de passe -->
+        <div class="input-group">
+          <label>Mot de passe</label>
+          <div class="input-wrap">
+            <mat-icon class="input-icon">lock_outline</mat-icon>
+            <input [type]="showPassword ? 'text' : 'password'"
+                   [(ngModel)]="password"
+                   placeholder="••••••••">
+            <mat-icon class="input-suffix"
+                      (click)="showPassword = !showPassword">
+              {{ showPassword ? 'visibility_off' : 'visibility' }}
+            </mat-icon>
+          </div>
+        </div>
+
+        <!-- Remember -->
+        <div class="remember-row">
+          <label class="checkbox-label">
+            <input type="checkbox"> Se souvenir de moi
+          </label>
+          <a class="forgot">Mot de passe oublié ?</a>
+        </div>
+
+        <!-- Bouton connexion -->
+        <button class="login-btn" (click)="login()">
+          → Se connecter
+        </button>
+
+        <div class="divider"><span>OU accès rapide</span></div>
+
+        <!-- Cartes rôles -->
+        <div class="role-cards">
+
+          <div class="role-card" (click)="loginAs('etudiant')">
+            <mat-icon style="color:#2196F3">school</mat-icon>
+            <span class="role-name etudiant">Étudiant</span>
+            <span class="role-desc">Accès étudiant</span>
+          </div>
+
+          <div class="role-card" (click)="loginAs('formateur')">
+            <mat-icon style="color:#4CAF50">group</mat-icon>
+            <span class="role-name formateur">Formateur</span>
+            <span class="role-desc">Accès formateur</span>
+          </div>
+
+          <div class="role-card" (click)="loginAs('admin')">
+            <mat-icon style="color:#F44336">shield</mat-icon>
+            <span class="role-name admin">Admin</span>
+            <span class="role-desc">Accès administrateur</span>
+          </div>
+
+        </div>
+
+        <p class="signup-link">
+          Pas encore de compte ?
+          <a routerLink="/inscription">S'inscrire gratuitement →</a>
+        </p>
+
+      </div>
+    </div>
+  </div>
+</div>

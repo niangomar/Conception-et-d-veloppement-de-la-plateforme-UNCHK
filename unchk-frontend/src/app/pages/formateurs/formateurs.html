@@ -1,0 +1,229 @@
+<div class="dashboard-wrapper">
+
+  <!-- NAVBAR -->
+  <mat-toolbar class="navbar">
+    <div class="navbar-left">
+      <img src="logoUnchk.png" alt="Logo" class="nav-logo">
+      <span class="nav-title">UN Cheikh Hamidou Kane</span>
+    </div>
+    <div class="navbar-right">
+      <button mat-icon-button><mat-icon>notifications</mat-icon></button>
+      <span class="user-name">Admin</span>
+      <button mat-icon-button routerLink="/login"><mat-icon>logout</mat-icon></button>
+    </div>
+  </mat-toolbar>
+
+  <div class="dashboard-container">
+
+    <!-- SIDEBAR -->
+    <!-- UNE SEULE LIGNE -->
+    <app-sidebar></app-sidebar>
+
+    <div class="main-content">
+
+      <!-- HEADER -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Gestion des Formateurs</h1>
+          <p class="page-subtitle">Enseignants, tuteurs et responsables</p>
+        </div>
+        <button mat-raised-button class="add-btn" (click)="openForm()">
+          <mat-icon>add</mat-icon> Ajouter un formateur
+        </button>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon"><mat-icon>people</mat-icon></div>
+          <div><h2>{{ formateurs.length }}</h2><p>Total formateurs</p></div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon"><mat-icon>check_circle</mat-icon></div>
+          <div><h2>{{ getActifs() }}</h2><p>Actifs</p></div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon"><mat-icon>school</mat-icon></div>
+          <div><h2>{{ getEnseignants() }}</h2><p>Enseignants</p></div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon"><mat-icon>support_agent</mat-icon></div>
+          <div><h2>{{ getTuteurs() }}</h2><p>Tuteurs</p></div>
+        </div>
+      </div>
+
+      <!-- RECHERCHE -->
+      <div class="search-bar">
+        <mat-icon>search</mat-icon>
+        <input type="text"
+               placeholder="Rechercher par nom, type, spécialité..."
+               [(ngModel)]="searchText"
+               (input)="filterFormateurs()">
+      </div>
+
+      <!-- FORMULAIRE -->
+      <mat-card class="form-card" *ngIf="showForm">
+        <mat-card-content>
+          <h3>
+            <mat-icon>{{ editMode ? 'edit' : 'add_circle' }}</mat-icon>
+            {{ editMode ? 'Modifier' : 'Ajouter' }} un formateur
+          </h3>
+
+          <div class="form-grid">
+
+            <mat-form-field appearance="outline">
+              <mat-label>Nom</mat-label>
+              <input matInput [(ngModel)]="formateur.nom">
+              <mat-icon matSuffix>person</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Prénom</mat-label>
+              <input matInput [(ngModel)]="formateur.prenom">
+              <mat-icon matSuffix>person_outline</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Type</mat-label>
+              <mat-select [(ngModel)]="formateur.type">
+                <mat-option *ngFor="let t of types" [value]="t">{{ t }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Grade</mat-label>
+              <mat-select [(ngModel)]="formateur.grade">
+                <mat-option *ngFor="let g of grades" [value]="g">{{ g }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Spécialité</mat-label>
+              <input matInput [(ngModel)]="formateur.specialite"
+                     placeholder="Ex: Informatique, Gestion...">
+              <mat-icon matSuffix>auto_stories</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Formation rattachée</mat-label>
+              <mat-select [(ngModel)]="formateur.formation">
+                <mat-option *ngFor="let f of formations" [value]="f">{{ f }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Email</mat-label>
+              <input matInput [(ngModel)]="formateur.email" type="email">
+              <mat-icon matSuffix>email</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Téléphone</mat-label>
+              <input matInput [(ngModel)]="formateur.telephone"
+                     placeholder="77 000 00 00">
+              <mat-icon matSuffix>phone</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Statut</mat-label>
+              <mat-select [(ngModel)]="formateur.statut">
+                <mat-option *ngFor="let s of statuts" [value]="s">{{ s }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+          </div>
+
+          <div class="form-actions">
+            <button mat-button (click)="showForm = false">Annuler</button>
+            <button mat-raised-button class="add-btn" (click)="saveFormateur()">
+              <mat-icon>save</mat-icon>
+              {{ editMode ? 'Modifier' : 'Enregistrer' }}
+            </button>
+          </div>
+
+        </mat-card-content>
+      </mat-card>
+
+      <!-- CARDS FORMATEURS -->
+      <div class="formateurs-grid">
+
+        <mat-card class="formateur-card" *ngFor="let f of filteredFormateurs">
+          <mat-card-content>
+
+            <div class="card-header">
+              <div class="avatar">
+                <mat-icon>{{ getTypeIcon(f.type) }}</mat-icon>
+              </div>
+              <div class="card-actions">
+                <button mat-icon-button color="primary"
+                        (click)="editFormateur(f)"
+                        matTooltip="Modifier">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn"
+                        (click)="deleteFormateur(f.id)"
+                        matTooltip="Supprimer">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <h3 class="formateur-nom">{{ f.prenom }} {{ f.nom }}</h3>
+
+            <div class="type-badge">
+              <mat-icon>{{ getTypeIcon(f.type) }}</mat-icon>
+              {{ f.type || 'Type non défini' }}
+            </div>
+
+            <div class="formateur-infos">
+
+              <div class="info-item" *ngIf="f.grade">
+                <mat-icon>military_tech</mat-icon>
+                <span>{{ f.grade }}</span>
+              </div>
+
+              <div class="info-item" *ngIf="f.specialite">
+                <mat-icon>auto_stories</mat-icon>
+                <span>{{ f.specialite }}</span>
+              </div>
+
+              <div class="info-item" *ngIf="f.formation">
+                <mat-icon>book</mat-icon>
+                <span>{{ f.formation }}</span>
+              </div>
+
+              <div class="info-item" *ngIf="f.email">
+                <mat-icon>email</mat-icon>
+                <span>{{ f.email }}</span>
+              </div>
+
+              <div class="info-item" *ngIf="f.telephone">
+                <mat-icon>phone</mat-icon>
+                <span>{{ f.telephone }}</span>
+              </div>
+
+            </div>
+
+            <div class="card-footer">
+              <span class="statut-badge" [ngClass]="getStatutClass(f.statut)">
+                <mat-icon>{{ getStatutIcon(f.statut) }}</mat-icon>
+                {{ f.statut || 'Actif' }}
+              </span>
+            </div>
+
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Message si vide -->
+        <div class="empty-msg" *ngIf="filteredFormateurs.length === 0">
+          <mat-icon>people</mat-icon>
+          <p>Aucun formateur trouvé.</p>
+          <button mat-raised-button class="add-btn" (click)="openForm()">
+            <mat-icon>add</mat-icon> Ajouter le premier
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

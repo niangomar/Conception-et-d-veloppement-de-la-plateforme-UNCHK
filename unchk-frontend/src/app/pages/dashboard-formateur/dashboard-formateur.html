@@ -1,0 +1,396 @@
+<div class="app-wrapper">
+
+  <!-- ── SIDEBAR ─────────────────────────────────────────────── -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <img src="logoUnchk.png" alt="Logo" class="nav-logo">
+      <span class="nav-title">UN Cheikh Hamidou Kane</span>
+    </div>
+
+    <div class="menu-label">MENU FORMATEUR</div>
+
+    <a class="menu-item" routerLink="/dashboard-formateur" routerLinkActive="active">
+      <mat-icon>home</mat-icon><span>Tableau de bord</span>
+    </a>
+    <a class="menu-item" routerLink="/mes-cours" routerLinkActive="active">
+      <mat-icon>menu_book</mat-icon><span>Mes cours</span>
+    </a>
+    <a class="menu-item" routerLink="/emploi-du-temps-formateur" routerLinkActive="active">
+      <mat-icon>calendar_today</mat-icon><span>Emploi du temps</span>
+    </a>
+    <a class="menu-item" routerLink="/mes-etudiants" routerLinkActive="active">
+      <mat-icon>groups</mat-icon><span>Mes étudiants</span>
+    </a>
+    <a class="menu-item" routerLink="/devoirs-formateur" routerLinkActive="active">
+      <mat-icon>assignment</mat-icon><span>Devoirs & Examens</span>
+    </a>
+    <a class="menu-item" routerLink="/documents-formateur" routerLinkActive="active">
+      <mat-icon>upload_file</mat-icon><span>Déposer documents</span>
+    </a>
+    <a class="menu-item" routerLink="/annonces-formateur" routerLinkActive="active">
+      <mat-icon>campaign</mat-icon><span>Annonces</span>
+    </a>
+    <a class="menu-item" routerLink="/mon-profil" routerLinkActive="active">
+      <mat-icon>person</mat-icon><span>Mon profil</span>
+    </a>
+
+    <div class="sidebar-footer">
+      <div class="year-badge">
+        <mat-icon>school</mat-icon>
+        <div>
+          <small>Année universitaire</small>
+          <strong>2025 - 2026</strong>
+        </div>
+      </div>
+      <a class="menu-item logout" routerLink="/login">
+        <mat-icon>logout</mat-icon><span>Déconnexion</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ── CONTENU PRINCIPAL ────────────────────────────────────── -->
+  <div class="main-content">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <h2>Tableau de bord</h2>
+      <div class="topbar-right">
+        <div class="notif-btn">
+          <mat-icon>notifications</mat-icon>
+          <span class="badge">2</span>
+        </div>
+        <div class="user-info">
+          <div class="avatar">{{ prenomUtilisateur[0] }}{{ nomUtilisateur[0] }}</div>
+          <span>{{ prenomUtilisateur }} {{ nomUtilisateur }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Corps -->
+    <div class="body-content">
+
+      <!-- Welcome -->
+      <div class="welcome">
+        <h1>Bonjour, {{ prenomUtilisateur }} 👋</h1>
+        <p>Bienvenue dans votre espace formateur</p>
+      </div>
+
+      <!-- ══ STATS ═══════════════════════════════════════════════ -->
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon"><mat-icon>menu_book</mat-icon></div>
+          <div class="stat-info">
+            <h2>{{ getNbCours() }}</h2>
+            <p>Cours dispensés</p>
+            <small>ce semestre</small>
+          </div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon"><mat-icon>groups</mat-icon></div>
+          <div class="stat-info">
+            <h2>{{ nbEtudiantsTotal }}</h2>
+            <p>Étudiants</p>
+            <small>au total</small>
+          </div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon"><mat-icon>assignment</mat-icon></div>
+          <div class="stat-info">
+            <h2>{{ getNbDevoirs() }}</h2>
+            <p>Devoirs</p>
+            <small>à corriger</small>
+          </div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon"><mat-icon>event</mat-icon></div>
+          <div class="stat-info">
+            <h2>{{ getNbSeances() }}</h2>
+            <p>Séances</p>
+            <small>cette semaine</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ GRILLE PRINCIPALE ═══════════════════════════════════ -->
+      <div class="main-grid">
+
+        <!-- ── Emploi du temps ─────────────────────────────── -->
+        <mat-card class="card">
+          <mat-card-content>
+            <div class="card-header">
+              <h3>📅 Mon emploi du temps</h3>
+              <a routerLink="/emploi-du-temps-formateur" class="voir-tout">Voir tout</a>
+            </div>
+            <div class="schedule">
+              <div class="schedule-item" *ngFor="let s of emploiDuTemps"
+                   [style.border-left-color]="s.color === 'blue' ? '#2196F3' : s.color === 'green' ? '#4CAF50' : '#9C27B0'">
+                <div class="schedule-left">
+                  <span class="schedule-jour">{{ s.jour }}</span>
+                  <span class="schedule-time">{{ s.heure }}</span>
+                </div>
+                <div class="schedule-right">
+                  <strong>{{ s.cours }}</strong>
+                  <small>{{ s.formation }} — {{ s.salle }}</small>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- ── Mes cours ───────────────────────────────────── -->
+        <mat-card class="card">
+          <mat-card-content>
+            <div class="card-header">
+              <h3>📚 Mes cours</h3>
+              <a routerLink="/mes-cours" class="voir-tout">Voir tout</a>
+            </div>
+            <div class="cours-list">
+              <div class="cours-item" *ngFor="let c of cours">
+                <div class="cours-icon" [class]="c.color">
+                  <mat-icon>{{ c.icon }}</mat-icon>
+                </div>
+                <div class="cours-info">
+                  <strong>{{ c.nom }}</strong>
+                  <small>{{ c.formation }} — {{ c.nbEtudiants }} étudiants</small>
+                  <div class="cours-moy">
+                    <span class="moy-label">Moy. classe :</span>
+                    <span class="moy-val" [class.moy-ok]="c.moyenneClasse >= 14"
+                          [class.moy-warn]="c.moyenneClasse < 14">
+                      {{ c.moyenneClasse }}/20
+                    </span>
+                  </div>
+                </div>
+                <div class="cours-badge">{{ c.niveau }}</div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- ── Devoirs à corriger ──────────────────────────── -->
+        <mat-card class="card">
+          <mat-card-content>
+            <div class="card-header">
+              <h3>📝 Devoirs à corriger</h3>
+              <a routerLink="/devoirs-formateur" class="voir-tout">Voir tout</a>
+            </div>
+            <div class="travaux-list">
+              <div class="travail-item" *ngFor="let d of devoirs">
+                <div class="travail-icon" [class]="d.color">
+                  <mat-icon>{{ d.icon }}</mat-icon>
+                </div>
+                <div class="travail-info">
+                  <strong>{{ d.nom }}</strong>
+                  <small>{{ d.formation }} — {{ d.nbRendus }}/{{ d.total }} rendus</small>
+                  <!-- Barre de progression rendus -->
+                  <div class="rendu-bar">
+                    <div class="rendu-fill" [ngClass]="d.color"
+                         [style.width.%]="getRenduPct(d)"></div>
+                  </div>
+                  <small class="date-limite">⏰ Limite : {{ d.dateLimite }}</small>
+                </div>
+                <div class="travail-badge" [class]="d.urgence">
+                  {{ d.jours }} j
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- ── Prochains examens ───────────────────────────── -->
+        <mat-card class="card">
+          <mat-card-content>
+            <div class="card-header">
+              <h3>📆 Prochains examens</h3>
+              <a routerLink="/devoirs-formateur" class="voir-tout">Voir tout</a>
+            </div>
+            <div class="examens-list">
+              <div class="examen-item" *ngFor="let e of examens">
+                <div class="examen-date" [class]="e.color">
+                  <strong>{{ e.jour }}</strong>
+                  <small>{{ e.mois }}</small>
+                </div>
+                <div class="examen-info">
+                  <strong>{{ e.matiere }}</strong>
+                  <small>{{ e.formation }} — {{ e.salle }}</small>
+                  <small class="examen-heure">
+                    <mat-icon style="font-size:12px;width:12px;height:12px">access_time</mat-icon>
+                    {{ e.heure }} ({{ e.duree }})
+                  </small>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- ── Documents récents ──────────────────────────── -->
+        <mat-card class="card">
+          <mat-card-content>
+            <div class="card-header">
+              <h3>📄 Documents récents</h3>
+              <a routerLink="/documents-formateur" class="voir-tout">Déposer</a>
+            </div>
+            <div class="loading-row" *ngIf="isLoadingDocuments">
+              <mat-icon>hourglass_empty</mat-icon>
+              <span>Chargement...</span>
+            </div>
+            <div class="doc-list" *ngIf="!isLoadingDocuments">
+              <div class="doc-item" *ngFor="let d of documents">
+                <div class="doc-icon" [ngClass]="getDocumentColor(d.type || d.titre)">
+                  <mat-icon>{{ getDocumentIcon(d.type) }}</mat-icon>
+                </div>
+                <div class="doc-info">
+                  <strong>{{ d.titre }}</strong>
+                  <small>{{ d.type }} · {{ d.date_doc | date:'dd/MM/yyyy' }}</small>
+                </div>
+                <button mat-icon-button (click)="ouvrirDocument(d)"
+                        *ngIf="d.fichier_url || d.fichierUrl"
+                        matTooltip="Ouvrir le document">
+                  <mat-icon>open_in_new</mat-icon>
+                </button>
+              </div>
+              <div class="empty-row" *ngIf="documents.length === 0">
+                <mat-icon>folder_open</mat-icon>
+                <span>Aucun document</span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- ── Annonces récentes ──────────────────────────── -->
+        <mat-card class="card">
+          <mat-card-content>
+            <div class="card-header">
+              <h3>📢 Annonces récentes</h3>
+              <a routerLink="/annonces-formateur" class="voir-tout">Voir tout</a>
+            </div>
+            <div class="loading-row" *ngIf="isLoadingAnnonces">
+              <mat-icon>hourglass_empty</mat-icon>
+              <span>Chargement...</span>
+            </div>
+            <div class="annonce-list" *ngIf="!isLoadingAnnonces">
+              <div class="annonce-item" *ngFor="let a of annonces">
+                <div class="annonce-icon" [class]="a.type">
+                  <mat-icon>{{ a.icon || 'campaign' }}</mat-icon>
+                </div>
+                <div class="annonce-info">
+                  <strong>{{ a.titre }}</strong>
+                  <p>{{ a.description || a.desc }}</p>
+                  <small>{{ (a.createdAt || a.date) | date:'dd/MM/yyyy' }}</small>
+                </div>
+              </div>
+              <div class="empty-row" *ngIf="annonces.length === 0">
+                <mat-icon>campaign</mat-icon>
+                <span>Aucune annonce</span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- ── Top étudiants ──────────────────────────────── -->
+        <mat-card class="card full-col">
+          <mat-card-content>
+            <div class="card-header">
+              <h3>🏆 Meilleurs étudiants</h3>
+              <a routerLink="/mes-etudiants-formateur" class="voir-tout">Voir tous</a>
+            </div>
+            <table class="top-table">
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Étudiant</th>
+                <th>Filière</th>
+                <th>Moyenne</th>
+                <th>Progression</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let e of topEtudiants; let i = index">
+                <td>
+                  <span class="rank" [ngClass]="'rank-' + (i+1)">{{ i + 1 }}</span>
+                </td>
+                <td>
+                  <div class="etudiant-cell">
+                    <div class="etudiant-av">
+                      {{ e.nom.split(' ')[0][0] }}{{ e.nom.split(' ')[1][0] }}
+                    </div>
+                    <strong>{{ e.nom }}</strong>
+                  </div>
+                </td>
+                <td><small>{{ e.formation }}</small></td>
+                <td>
+                  <strong [class.moy-ok]="e.moyenne >= 15"
+                          [class.moy-warn]="e.moyenne < 15">
+                    {{ e.moyenne }}/20
+                  </strong>
+                </td>
+                <td>
+                  <div class="prog-bar">
+                    <div class="prog-fill" [ngClass]="e.color"
+                         [style.width.%]="e.pct"></div>
+                  </div>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- ── Activités + Profil ─────────────────────────── -->
+        <mat-card class="card">
+          <mat-card-content>
+            <div class="card-header">
+              <h3>🕐 Dernières activités</h3>
+            </div>
+            <div class="activites-list">
+              <div class="activite-item" *ngFor="let a of activites">
+                <div class="activite-dot" [class]="a.color"></div>
+                <div class="activite-info">
+                  <strong>{{ a.titre }}</strong>
+                  <small>{{ a.temps }}</small>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- ── Profil formateur ───────────────────────────── -->
+        <mat-card class="card profil-card">
+          <mat-card-content>
+            <div class="card-header">
+              <h3>👤 Mon profil</h3>
+              <a routerLink="/mon-profil-formateur" class="voir-tout">Modifier</a>
+            </div>
+            <div class="profil-body">
+              <div class="profil-avatar">
+                {{ prenomUtilisateur[0] }}{{ nomUtilisateur[0] }}
+              </div>
+              <div class="profil-details">
+                <h2>{{ prenomUtilisateur }} {{ nomUtilisateur }}</h2>
+                <span class="profil-role">Formateur</span>
+                <div class="profil-infos">
+                  <div class="profil-info-item">
+                    <mat-icon>email</mat-icon>
+                    <span>{{ emailUtilisateur }}</span>
+                  </div>
+                  <div class="profil-info-item">
+                    <mat-icon>school</mat-icon>
+                    <span>Département Informatique</span>
+                  </div>
+                  <div class="profil-info-item">
+                    <mat-icon>badge</mat-icon>
+                    <span>{{ roleUtilisateur }}</span>
+                  </div>
+                  <div class="profil-info-item">
+                    <mat-icon>star</mat-icon>
+                    <span>Moyenne générale : <strong>{{ moyenneGenerale }}/20</strong></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+      </div>
+    </div>
+  </div>
+</div>

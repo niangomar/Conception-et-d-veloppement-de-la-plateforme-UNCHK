@@ -1,0 +1,265 @@
+Voici le `dashboard.html` complet avec la notification intégrée correctement :
+
+```html
+<div class="dashboard-wrapper">
+  <!-- Navbar -->
+  <mat-toolbar class="navbar">
+    <div class="navbar-left">
+      <img src="logoUnchk.png" alt="Logo" class="nav-logo">
+      <span class="nav-title">UN Cheikh Hamidou Kane</span>
+    </div>
+    <div class="navbar-center">
+      <mat-icon>calendar_today</mat-icon>
+      <span>{{ dateAujourdhui }}</span>
+      <mat-icon style="margin-left:15px">access_time</mat-icon>
+      <span>{{ heureActuelle }}</span>
+    </div>
+    <div class="navbar-right">
+
+      <!-- CLOCHE NOTIFICATIONS -->
+      <div class="notif-btn" (click)="toggleNotifications()">
+        <mat-icon>notifications</mat-icon>
+        <span class="notif-badge" *ngIf="notifNonLues > 0">{{ notifNonLues }}</span>
+
+        <div class="notif-dropdown" *ngIf="showNotifications" (click)="$event.stopPropagation()">
+          <div class="notif-header">
+            <span>Notifications</span>
+            <button class="mark-all-btn" (click)="marquerToutLu()">Tout marquer lu</button>
+          </div>
+          <div class="notif-list">
+            <div
+              class="notif-item"
+              *ngFor="let n of notifications"
+              [class.non-lu]="!n.lu"
+              (click)="marquerLu(n.id)">
+              <div class="notif-icon" [class]="n.color">
+                <mat-icon>{{ n.icon }}</mat-icon>
+              </div>
+              <div class="notif-content">
+                <strong>{{ n.titre }}</strong>
+                <p>{{ n.message }}</p>
+                <small>{{ n.temps }}</small>
+              </div>
+              <button class="notif-close" (click)="supprimerNotif(n.id, $event)">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+            <div class="notif-empty" *ngIf="notifications.length === 0">
+              <mat-icon>notifications_none</mat-icon>
+              <p>Aucune notification</p>
+            </div>
+          </div>
+          <div class="notif-footer">
+            <a>Voir toutes les notifications →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-info">
+        <mat-icon class="admin-icon">account_circle</mat-icon>
+        <span class="user-name">Admin</span>
+      </div>
+      <button mat-icon-button routerLink="/login" title="Déconnexion">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
+  </mat-toolbar>
+
+  <div class="dashboard-container">
+    <app-sidebar></app-sidebar>
+
+    <div class="main-content">
+
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Tableau de bord</h1>
+          <p class="page-subtitle">Bienvenue sur la plateforme de gestion de l'UNCHK</p>
+        </div>
+        <div class="salutation">
+          <span>{{ salutation }}, <strong>Admin</strong> 👋</span>
+        </div>
+      </div>
+
+      <!-- Cartes statistiques -->
+      <div class="stats-grid">
+        <mat-card class="stat-card blue">
+          <mat-card-content>
+            <div class="stat-icon-wrap"><mat-icon>school</mat-icon></div>
+            <div class="stat-info">
+              <h3>1 245</h3>
+              <p>Étudiants</p>
+              <small class="stat-trend">+12% ce mois ↗</small>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="stat-card green">
+          <mat-card-content>
+            <div class="stat-icon-wrap"><mat-icon>person</mat-icon></div>
+            <div class="stat-info">
+              <h3>87</h3>
+              <p>Formateurs</p>
+              <small class="stat-trend">+5% ce mois ↗</small>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="stat-card orange">
+          <mat-card-content>
+            <div class="stat-icon-wrap"><mat-icon>book</mat-icon></div>
+            <div class="stat-info">
+              <h3>34</h3>
+              <p>Formations</p>
+              <small class="stat-trend">+8% ce mois ↗</small>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="stat-card red">
+          <mat-card-content>
+            <div class="stat-icon-wrap"><mat-icon>description</mat-icon></div>
+            <div class="stat-info">
+              <h3>128</h3>
+              <p>Documents</p>
+              <small class="stat-trend">+15% ce mois ↗</small>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Grille principale -->
+      <div class="main-grid">
+
+        <mat-card class="card">
+          <mat-card-content>
+            <h3 class="card-title">📊 Étudiants inscrits par filière</h3>
+            <canvas #barChart></canvas>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="card">
+          <mat-card-content>
+            <h3 class="card-title">📅 Événements à venir</h3>
+            <div class="events-list">
+              <div class="event-item" *ngFor="let e of evenements">
+                <div class="event-date" [class]="e.color">
+                  <strong>{{ e.jour }}</strong>
+                  <small>{{ e.mois }}</small>
+                </div>
+                <div class="event-info">
+                  <strong>{{ e.titre }}</strong>
+                  <small>{{ e.heure }}</small>
+                </div>
+              </div>
+            </div>
+            <a class="voir-plus">Voir tous les événements →</a>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="card">
+          <mat-card-content>
+            <h3 class="card-title">📈 Évolution des inscriptions (12 mois)</h3>
+            <canvas #lineChart></canvas>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="card donut-card">
+          <mat-card-content>
+            <h3 class="card-title">👥 Répartition par genre</h3>
+            <div class="donut-wrap">
+              <canvas #donutChart></canvas>
+              <div class="donut-center">
+                <strong>1 245</strong>
+                <small>Étudiants</small>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="card">
+          <mat-card-content>
+            <h3 class="card-title">⚡ Statistiques rapides</h3>
+            <div class="quick-stats">
+              <div class="quick-stat-item">
+                <mat-icon style="color:#4CAF50">groups</mat-icon>
+                <div>
+                  <strong>1 080</strong>
+                  <small>Étudiants actifs</small>
+                  <span class="trend green-text">+10% ce mois ↗</span>
+                </div>
+              </div>
+              <div class="quick-stat-item">
+                <mat-icon style="color:#FF9800">event</mat-icon>
+                <div>
+                  <strong>5</strong>
+                  <small>Réunions aujourd'hui</small>
+                  <span class="trend orange-text">+2 depuis hier</span>
+                </div>
+              </div>
+              <div class="quick-stat-item">
+                <mat-icon style="color:#2196F3">description</mat-icon>
+                <div>
+                  <strong>23</strong>
+                  <small>Documents récents</small>
+                  <span class="trend blue-text">+7 ce mois</span>
+                </div>
+              </div>
+              <div class="quick-stat-item">
+                <mat-icon style="color:#9C27B0">school</mat-icon>
+                <div>
+                  <strong>95%</strong>
+                  <small>Taux de réussite</small>
+                  <span class="trend purple-text">+3% ce mois ↗</span>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="card">
+          <mat-card-content>
+            <h3 class="card-title">🕐 Dernières activités</h3>
+            <div class="activites-list">
+              <div class="activite-item" *ngFor="let a of activites">
+                <div class="activite-dot" [class]="a.color"></div>
+                <div class="activite-info">
+                  <strong>{{ a.titre }}</strong>
+                  <small>{{ a.temps }}</small>
+                </div>
+              </div>
+            </div>
+            <a class="voir-plus">Voir toutes les activités →</a>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="card full-col">
+          <mat-card-content>
+            <h3 class="card-title">🏆 Top formations populaires</h3>
+            <table class="formations-table">
+              <thead>
+              <tr>
+                <th>Formation</th>
+                <th>Étudiants</th>
+                <th>Progression</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let f of topFormations">
+                <td>{{ f.nom }}</td>
+                <td><strong>{{ f.nb }}</strong></td>
+                <td>
+                  <div class="progress-bar">
+                    <div class="progress-fill" [style.width.%]="f.pct" [class]="f.color"></div>
+                  </div>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </mat-card-content>
+        </mat-card>
+
+      </div>
+    </div>
+  </div>
+</div>
+```

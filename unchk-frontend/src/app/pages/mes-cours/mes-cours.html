@@ -1,0 +1,165 @@
+<div class="app-wrapper">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <img src="logoUnchk.png" alt="Logo" class="nav-logo">
+      <span class="nav-title">UN Cheikh Hamidou Kane</span>
+    </div>
+    <div class="menu-label">MENU FORMATEUR</div>
+    <a class="menu-item" routerLink="/dashboard-formateur" routerLinkActive="active"><mat-icon>home</mat-icon><span>Tableau de bord</span></a>
+    <a class="menu-item" routerLink="/mes-cours" routerLinkActive="active"><mat-icon>menu_book</mat-icon><span>Mes cours</span></a>
+    <a class="menu-item" routerLink="/emploi-du-temps-formateur" routerLinkActive="active"><mat-icon>calendar_today</mat-icon><span>Emploi du temps</span></a>
+    <a class="menu-item" routerLink="/mes-etudiants" routerLinkActive="active"><mat-icon>groups</mat-icon><span>Mes étudiants</span></a>
+    <a class="menu-item" routerLink="/devoirs-formateur" routerLinkActive="active"><mat-icon>assignment</mat-icon><span>Devoirs & Examens</span></a>
+    <a class="menu-item" routerLink="/documents-formateur" routerLinkActive="active"><mat-icon>upload_file</mat-icon><span>Déposer documents</span></a>    <a class="menu-item" routerLink="/annonces-formateur" routerLinkActive="active"><mat-icon>campaign</mat-icon><span>Annonces</span></a>
+    <a class="menu-item" routerLink="/mon-profil-formateur" routerLinkActive="active"><mat-icon>person</mat-icon><span>Mon profil</span></a>
+    <div class="sidebar-footer">
+      <div class="year-badge">
+        <mat-icon>school</mat-icon>
+        <div><small>Année universitaire</small><strong>2025 - 2026</strong></div>
+      </div>
+      <a class="menu-item logout" routerLink="/login"><mat-icon>logout</mat-icon><span>Déconnexion</span></a>
+    </div>
+  </div>
+
+  <!-- CONTENU -->
+  <div class="main-content">
+    <div class="topbar">
+      <h2>Mes cours</h2>
+      <div class="topbar-right">
+        <div class="notif-btn"><mat-icon>notifications</mat-icon><span class="badge">2</span></div>
+        <div class="user-info">
+          <div class="avatar">{{ prenomUtilisateur[0] }}{{ nomUtilisateur[0] }}</div>
+          <span>{{ prenomUtilisateur }} {{ nomUtilisateur }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="body-content">
+      <div class="welcome">
+        <h1>📚 Mes cours</h1>
+        <p>Gérez vos cours du semestre en cours</p>
+      </div>
+
+      <!-- Stats rapides -->
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon"><mat-icon>menu_book</mat-icon></div>
+          <div class="stat-info">
+            <h2>{{ cours.length }}</h2>
+            <p>Cours dispensés</p><small>ce semestre</small>
+          </div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon"><mat-icon>groups</mat-icon></div>
+          <div class="stat-info">
+            <h2>{{ getTotalEtudiants() }}</h2>
+            <p>Étudiants</p><small>au total</small>
+          </div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon"><mat-icon>star</mat-icon></div>
+          <div class="stat-info"><h2>13.7</h2><p>Moyenne générale</p><small>/20</small></div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon"><mat-icon>trending_up</mat-icon></div>
+          <div class="stat-info"><h2>78%</h2><p>Taux de réussite</p><small>ce semestre</small></div>
+        </div>
+      </div>
+
+      <!-- Filtres -->
+      <div class="filtres-bar">
+        <button [class.actif]="filtreActif === 'tous'" (click)="filtrer('tous')">Tous les cours</button>
+        <button *ngFor="let n of niveaux"
+                [class.actif]="filtreActif === n.toLowerCase()"
+                (click)="filtrer(n.toLowerCase())">{{ n }}</button>
+      </div>
+
+      <!-- Liste des cours -->
+      <div class="cours-grid">
+        <div class="cours-card" *ngFor="let c of coursFiltres">
+
+          <!-- En-tête de la carte cours -->
+          <div class="cours-card-header" [ngClass]="'header-' + c.color">
+            <div class="cours-header-left">
+              <div class="cours-icon-big">
+                <mat-icon>{{ c.icon }}</mat-icon>
+              </div>
+              <div>
+                <h3>{{ c.nom }}</h3>
+                <span class="cours-code">{{ c.code }}</span>
+              </div>
+            </div>
+            <div class="niveau-badge">{{ c.niveau }}</div>
+          </div>
+
+          <!-- Corps de la carte cours -->
+          <div class="cours-card-body">
+            <p class="cours-description">{{ c.description }}</p>
+
+            <!-- Infos principales -->
+            <div class="cours-infos">
+              <div class="cours-info-item">
+                <mat-icon>school</mat-icon>
+                <span>{{ c.formation }}</span>
+              </div>
+              <div class="cours-info-item">
+                <mat-icon>groups</mat-icon>
+                <span>{{ c.nbEtudiants }} étudiants inscrits</span>
+              </div>
+              <div class="cours-info-item">
+                <mat-icon>stars</mat-icon>
+                <span>{{ c.credits }} crédits ECTS</span>
+              </div>
+              <div class="cours-info-item">
+                <mat-icon>schedule</mat-icon>
+                <span>{{ c.volumeHoraire }}h — {{ c.semestre }}</span>
+              </div>
+              <div class="cours-info-item prochain">
+                <mat-icon>event</mat-icon>
+                <span>{{ c.prochainCours }}</span>
+              </div>
+            </div>
+
+            <!-- Statistiques -->
+            <div class="cours-stats">
+              <div class="stat-item">
+                <span class="stat-label">Moyenne classe</span>
+                <span class="stat-value" [class.ok]="c.moyenneClasse >= 14" [class.warn]="c.moyenneClasse < 14">
+                  {{ c.moyenneClasse }}/20
+                </span>
+                <div class="stat-bar">
+                  <div class="stat-bar-fill" [ngClass]="'fill-' + c.color" [style.width.%]="(c.moyenneClasse / 20) * 100"></div>
+                </div>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Taux de réussite</span>
+                <span class="stat-value" [class.ok]="c.tauxReussite >= 75" [class.warn]="c.tauxReussite < 75">
+                  {{ c.tauxReussite }}%
+                </span>
+                <div class="stat-bar">
+                  <div class="stat-bar-fill" [ngClass]="'fill-' + c.color" [style.width.%]="c.tauxReussite"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="cours-actions">
+              <button class="btn-action" [ngClass]="'btn-' + c.color" routerLink="/devoirs-formateur">
+                <mat-icon>assignment</mat-icon> Devoirs
+              </button>
+              <button class="btn-action btn-outline" routerLink="/mes-etudiants">
+                <mat-icon>groups</mat-icon> Étudiants
+              </button>
+              <button class="btn-action btn-outline" routerLink="/devoirs-formateur">
+                <mat-icon>grade</mat-icon> Notes
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

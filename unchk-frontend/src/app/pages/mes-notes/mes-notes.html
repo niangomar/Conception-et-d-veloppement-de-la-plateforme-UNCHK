@@ -1,0 +1,198 @@
+<div class="app-wrapper">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <img src="logoUnchk.png" alt="Logo" class="nav-logo">
+      <span class="nav-title">UN Cheikh Hamidou Kane</span>
+    </div>
+
+    <div class="menu-label">MENU ÉTUDIANT</div>
+
+    <a class="menu-item" routerLink="/dashboard-etudiant" routerLinkActive="active">
+      <mat-icon>home</mat-icon><span>Tableau de bord</span>
+    </a>
+    <a class="menu-item" routerLink="/emploi-du-temps" routerLinkActive="active">
+      <mat-icon>calendar_today</mat-icon><span>Emploi du temps</span>
+    </a>
+    <a class="menu-item" routerLink="/mes-devoirs" routerLinkActive="active">
+      <mat-icon>assignment</mat-icon><span>Mes devoirs</span>
+    </a>
+    <a class="menu-item" routerLink="/examens-etudiant" routerLinkActive="active">
+      <mat-icon>quiz</mat-icon><span>Examens</span>
+    </a>
+    <a class="menu-item" routerLink="/mes-notes" routerLinkActive="active">
+      <mat-icon>grade</mat-icon><span>Mes notes</span>
+    </a>
+    <a class="menu-item" routerLink="/mes-documents" routerLinkActive="active">
+      <mat-icon>description</mat-icon><span>Mes documents</span>
+    </a>
+    <a class="menu-item" routerLink="/annonces" routerLinkActive="active">
+      <mat-icon>campaign</mat-icon><span>Annonces</span>
+    </a>
+    <a class="menu-item" routerLink="/mon-profil" routerLinkActive="active">
+      <mat-icon>person</mat-icon><span>Mon profil</span>
+    </a>
+
+    <div class="sidebar-footer">
+      <div class="year-badge">
+        <mat-icon>school</mat-icon>
+        <div>
+          <small>Année universitaire</small>
+          <strong>2025 - 2026</strong>
+        </div>
+      </div>
+      <a class="menu-item logout" routerLink="/login">
+        <mat-icon>logout</mat-icon><span>Déconnexion</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Contenu principal -->
+  <div class="main-content">
+    <!-- Topbar -->
+    <div class="topbar">
+      <h2>Mes notes</h2>
+      <div class="topbar-right">
+        <div class="notif-btn">
+          <mat-icon>notifications</mat-icon>
+          <span class="badge">3</span>
+        </div>
+        <div class="user-info">
+          <div class="avatar">{{ prenomUtilisateur[0] }}{{ nomUtilisateur[0] }}</div>
+          <span>{{ prenomUtilisateur }} {{ nomUtilisateur }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Corps -->
+    <div class="body-content">
+
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Mes résultats académiques</h1>
+          <p class="page-subtitle">Consultez vos notes par semestre et par matière</p>
+        </div>
+
+        <!-- Switch semestre -->
+        <div class="semestre-switch">
+          <button *ngFor="let s of semestres"
+                  class="semestre-btn"
+                  [class.active]="currentSemestre === s"
+                  (click)="filterSemestre(s)">
+            {{ s }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div class="loading-row" *ngIf="isLoading">
+        <mat-icon class="spin">hourglass_empty</mat-icon>
+        <span>Chargement des notes...</span>
+      </div>
+
+      <ng-container *ngIf="!isLoading">
+
+        <!-- STATS -->
+        <div class="stats-grid">
+          <div class="stat-card purple">
+            <div class="stat-icon"><mat-icon>grade</mat-icon></div>
+            <div class="stat-info">
+              <h2>{{ getMoyenne() | number:'1.2-2' }}</h2>
+              <p>Moyenne générale</p>
+              <small>{{ getMentionLabel(getMoyenne()) }}</small>
+            </div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-icon"><mat-icon>trending_up</mat-icon></div>
+            <div class="stat-info">
+              <h2>{{ getMeilleureNote() | number:'1.2-2' }}</h2>
+              <p>Meilleure note</p>
+              <small>sur 20</small>
+            </div>
+          </div>
+          <div class="stat-card blue">
+            <div class="stat-icon"><mat-icon>menu_book</mat-icon></div>
+            <div class="stat-info">
+              <h2>{{ getNbMatieres() }}</h2>
+              <p>Matières évaluées</p>
+              <small>{{ currentSemestre }}</small>
+            </div>
+          </div>
+          <div class="stat-card orange">
+            <div class="stat-icon"><mat-icon>fact_check</mat-icon></div>
+            <div class="stat-info">
+              <h2>{{ getNbEvaluations() }}</h2>
+              <p>Évaluations</p>
+              <small>total</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- FILTRES TYPE -->
+        <div class="filter-bar">
+          <button class="filter-btn" [class.active]="currentFilter === ''" (click)="filterType('')">
+            <mat-icon>filter_list</mat-icon> Toutes
+          </button>
+          <button class="filter-btn" [class.active]="currentFilter === 'Examen'" (click)="filterType('Examen')">
+            <mat-icon>quiz</mat-icon> Examens
+          </button>
+          <button class="filter-btn" [class.active]="currentFilter === 'Devoir'" (click)="filterType('Devoir')">
+            <mat-icon>edit_note</mat-icon> Devoirs
+          </button>
+          <button class="filter-btn" [class.active]="currentFilter === 'TP'" (click)="filterType('TP')">
+            <mat-icon>science</mat-icon> TP / TD
+          </button>
+        </div>
+
+        <!-- TABLEAU -->
+        <div class="table-wrapper">
+          <table class="notes-table">
+            <thead>
+            <tr>
+              <th>Matière</th>
+              <th>Type</th>
+              <th>Enseignant</th>
+              <th>Date</th>
+              <th>Note</th>
+              <th>Progression</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let n of filteredNotes">
+              <td><strong class="matiere-name">{{ n.matiere }}</strong></td>
+              <td>
+                  <span class="type-badge" [ngClass]="getTypeColor(n.type)">
+                    <mat-icon>{{ getTypeIcon(n.type) }}</mat-icon>
+                    {{ n.type }}
+                  </span>
+              </td>
+              <td class="text-muted">{{ n.enseignant || '—' }}</td>
+              <td class="text-muted">{{ n.date ? (n.date | date:'dd/MM/yyyy') : '—' }}</td>
+              <td>
+                  <span class="note-value" [ngClass]="getNoteClass(n.note, n.noteMax)">
+                    {{ n.note }}<span class="note-max">/{{ n.noteMax }}</span>
+                  </span>
+              </td>
+              <td>
+                <div class="note-bar">
+                  <div class="note-fill"
+                       [style.width.%]="(n.note / n.noteMax) * 100"
+                       [ngClass]="getNoteClass(n.note, n.noteMax)">
+                  </div>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+
+          <div class="empty-msg" *ngIf="filteredNotes.length === 0">
+            <mat-icon>grade</mat-icon>
+            <p>Aucune note trouvée pour ce filtre.</p>
+          </div>
+        </div>
+
+      </ng-container>
+
+    </div>
+  </div>
+</div>

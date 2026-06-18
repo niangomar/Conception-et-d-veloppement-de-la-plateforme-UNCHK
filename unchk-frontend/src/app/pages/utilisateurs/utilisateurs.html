@@ -1,0 +1,193 @@
+<div class="dashboard-wrapper">
+
+  <!-- NAVBAR -->
+  <mat-toolbar class="navbar">
+    <div class="navbar-left">
+      <img src="logoUnchk.png" alt="Logo" class="nav-logo">
+      <span class="nav-title">UN Cheikh Hamidou Kane</span>
+    </div>
+    <div class="navbar-right">
+      <button mat-icon-button><mat-icon>notifications</mat-icon></button>
+      <span class="user-name">Admin</span>
+      <button mat-icon-button routerLink="/login"><mat-icon>logout</mat-icon></button>
+    </div>
+  </mat-toolbar>
+
+  <div class="dashboard-container">
+
+    <!-- SIDEBAR -->
+    <app-sidebar></app-sidebar>
+
+    <div class="main-content">
+
+      <!-- HEADER -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Gestion des Utilisateurs</h1>
+          <p class="page-subtitle">Tous les comptes de la plateforme</p>
+        </div>
+        <button mat-raised-button class="add-btn" (click)="openForm()">
+          <mat-icon>add</mat-icon> Ajouter un utilisateur
+        </button>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon"><mat-icon>group</mat-icon></div>
+          <div><h2>{{ utilisateurs.length }}</h2><p>Total utilisateurs</p></div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon"><mat-icon>check_circle</mat-icon></div>
+          <div><h2>{{ getActifs() }}</h2><p>Comptes actifs</p></div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon"><mat-icon>shield</mat-icon></div>
+          <div><h2>{{ getAdmins() }}</h2><p>Administrateurs</p></div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon"><mat-icon>school</mat-icon></div>
+          <div><h2>{{ getEtudiants() }}</h2><p>Étudiants</p></div>
+        </div>
+      </div>
+
+      <!-- RECHERCHE -->
+      <div class="search-bar">
+        <mat-icon>search</mat-icon>
+        <input type="text"
+               placeholder="Rechercher par nom, email, rôle..."
+               [(ngModel)]="searchText"
+               (input)="filterUtilisateurs()">
+      </div>
+
+      <!-- FORMULAIRE -->
+      <mat-card class="form-card" *ngIf="showForm">
+        <mat-card-content>
+          <h3>
+            <mat-icon>{{ editMode ? 'edit' : 'add_circle' }}</mat-icon>
+            {{ editMode ? 'Modifier' : 'Ajouter' }} un utilisateur
+          </h3>
+
+          <div class="form-grid">
+
+            <mat-form-field appearance="outline">
+              <mat-label>Nom</mat-label>
+              <input matInput [(ngModel)]="utilisateur.nom">
+              <mat-icon matSuffix>person</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Prénom</mat-label>
+              <input matInput [(ngModel)]="utilisateur.prenom">
+              <mat-icon matSuffix>person_outline</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Email</mat-label>
+              <input matInput [(ngModel)]="utilisateur.email"
+                     type="email" placeholder="ex: nom@unchk.sn">
+              <mat-icon matSuffix>email</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Mot de passe</mat-label>
+              <input matInput [(ngModel)]="utilisateur.motDePasse"
+                     type="password">
+              <mat-icon matSuffix>lock</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Rôle</mat-label>
+              <mat-select [(ngModel)]="utilisateur.role">
+                <mat-option *ngFor="let r of roles" [value]="r">{{ r }}</mat-option>
+              </mat-select>
+              <mat-icon matSuffix>manage_accounts</mat-icon>
+            </mat-form-field>
+
+          </div>
+
+          <div class="form-actions">
+            <button mat-button (click)="showForm = false">Annuler</button>
+            <button mat-raised-button class="add-btn" (click)="saveUtilisateur()">
+              <mat-icon>save</mat-icon>
+              {{ editMode ? 'Modifier' : 'Enregistrer' }}
+            </button>
+          </div>
+
+        </mat-card-content>
+      </mat-card>
+
+      <!-- CARDS UTILISATEURS -->
+      <div class="utilisateurs-grid">
+
+        <mat-card class="utilisateur-card" *ngFor="let u of filteredUtilisateurs">
+          <mat-card-content>
+
+            <div class="card-header">
+              <div class="avatar" [ngClass]="getRoleClass(u.role)">
+                {{ getAvatar(u) }}
+              </div>
+              <div class="card-actions">
+                <button mat-icon-button color="primary"
+                        (click)="editUtilisateur(u)"
+                        matTooltip="Modifier">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn"
+                        (click)="deleteUtilisateur(u.id)"
+                        matTooltip="Supprimer">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <h3 class="utilisateur-nom">{{ u.prenom }} {{ u.nom }}</h3>
+
+            <div class="role-badge" [ngClass]="getRoleClass(u.role)">
+              <mat-icon>{{ getRoleIcon(u.role) }}</mat-icon>
+              {{ u.role }}
+            </div>
+
+            <div class="utilisateur-infos">
+
+              <div class="info-item" *ngIf="u.email">
+                <mat-icon>email</mat-icon>
+                <span>{{ u.email }}</span>
+              </div>
+
+              <div class="info-item">
+                <mat-icon>{{ u.actif ? 'toggle_on' : 'toggle_off' }}</mat-icon>
+                <span>{{ u.actif ? 'Compte actif' : 'Compte désactivé' }}</span>
+              </div>
+
+            </div>
+
+            <div class="card-footer">
+              <span class="actif-badge" [ngClass]="u.actif ? 'actif' : 'inactif'">
+                <mat-icon>{{ u.actif ? 'check_circle' : 'cancel' }}</mat-icon>
+                {{ u.actif ? 'Actif' : 'Inactif' }}
+              </span>
+              <button mat-stroked-button class="toggle-btn"
+                      (click)="toggleActif(u)"
+                      [matTooltip]="u.actif ? 'Désactiver' : 'Activer'">
+                <mat-icon>{{ u.actif ? 'block' : 'check_circle' }}</mat-icon>
+                {{ u.actif ? 'Désactiver' : 'Activer' }}
+              </button>
+            </div>
+
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Message si vide -->
+        <div class="empty-msg" *ngIf="filteredUtilisateurs.length === 0">
+          <mat-icon>group_off</mat-icon>
+          <p>Aucun utilisateur trouvé.</p>
+          <button mat-raised-button class="add-btn" (click)="openForm()">
+            <mat-icon>add</mat-icon> Ajouter le premier
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

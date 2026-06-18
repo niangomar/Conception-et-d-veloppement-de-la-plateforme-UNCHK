@@ -1,0 +1,224 @@
+<div class="dashboard-wrapper">
+
+  <!-- NAVBAR -->
+  <mat-toolbar class="navbar">
+    <div class="navbar-left">
+      <img src="logoUnchk.png" alt="Logo" class="nav-logo">
+      <span class="nav-title">UN Cheikh Hamidou Kane</span>
+    </div>
+    <div class="navbar-right">
+      <button mat-icon-button><mat-icon>notifications</mat-icon></button>
+      <span class="user-name">Admin</span>
+      <button mat-icon-button routerLink="/login"><mat-icon>logout</mat-icon></button>
+    </div>
+  </mat-toolbar>
+
+  <div class="dashboard-container">
+
+    <app-sidebar></app-sidebar>
+
+    <div class="main-content">
+
+      <!-- HEADER -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Annonces</h1>
+          <p class="page-subtitle">Publiez des informations pour les étudiants et formateurs</p>
+        </div>
+        <button mat-raised-button class="add-btn" (click)="openForm()">
+          <mat-icon>add</mat-icon> Nouvelle annonce
+        </button>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon"><mat-icon>campaign</mat-icon></div>
+          <div><h2>{{ annonces.length }}</h2><p>Total annonces</p></div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon"><mat-icon>check_circle</mat-icon></div>
+          <div><h2>{{ getActives() }}</h2><p>Actives</p></div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon"><mat-icon>warning</mat-icon></div>
+          <div><h2>{{ getCount('urgent') }}</h2><p>Urgentes</p></div>
+        </div>
+        <div class="stat-card rouge">
+          <div class="stat-icon"><mat-icon>inventory_2</mat-icon></div>
+          <div><h2>{{ getArchivees() }}</h2><p>Archivées</p></div>
+        </div>
+      </div>
+
+      <!-- FILTRES -->
+      <div class="filter-bar">
+        <button class="filter-btn" [class.active]="currentFilter === ''"
+                (click)="filterType('')">
+          <mat-icon>filter_list</mat-icon> Toutes
+        </button>
+        <button class="filter-btn" [class.active]="currentFilter === 'info'"
+                (click)="filterType('info')">
+          <mat-icon>info</mat-icon> Informations
+        </button>
+        <button class="filter-btn" [class.active]="currentFilter === 'urgent'"
+                (click)="filterType('urgent')">
+          <mat-icon>warning</mat-icon> Urgentes
+        </button>
+        <button class="filter-btn" [class.active]="currentFilter === 'examen'"
+                (click)="filterType('examen')">
+          <mat-icon>school</mat-icon> Examens
+        </button>
+        <button class="filter-btn" [class.active]="currentFilter === 'reunion'"
+                (click)="filterType('reunion')">
+          <mat-icon>groups</mat-icon> Réunions
+        </button>
+        <button class="filter-btn" [class.active]="currentFilter === 'doc'"
+                (click)="filterType('doc')">
+          <mat-icon>description</mat-icon> Documents
+        </button>
+      </div>
+
+      <!-- RECHERCHE -->
+      <div class="search-bar">
+        <mat-icon>search</mat-icon>
+        <input type="text"
+               placeholder="Rechercher par titre, description..."
+               [(ngModel)]="searchText"
+               (input)="filterSearch()">
+      </div>
+
+      <!-- FORMULAIRE -->
+      <mat-card class="form-card" *ngIf="showForm">
+        <mat-card-content>
+          <h3>
+            <mat-icon>{{ editMode ? 'edit' : 'add_circle' }}</mat-icon>
+            {{ editMode ? 'Modifier' : 'Publier' }} une annonce
+          </h3>
+
+          <div class="form-grid">
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Titre</mat-label>
+              <input matInput [(ngModel)]="annonce.titre"
+                     placeholder="Ex: Examens du semestre">
+              <mat-icon matSuffix>title</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Type</mat-label>
+              <mat-select [(ngModel)]="annonce.type" (selectionChange)="onTypeChange()">
+                <mat-option value="info">Information</mat-option>
+                <mat-option value="urgent">Urgent</mat-option>
+                <mat-option value="examen">Examen</mat-option>
+                <mat-option value="reunion">Réunion</mat-option>
+                <mat-option value="doc">Document</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Accès</mat-label>
+              <mat-select [(ngModel)]="annonce.roleAcces">
+                <mat-option *ngFor="let r of rolesAcces" [value]="r">{{ r }}</mat-option>
+              </mat-select>
+              <mat-icon matSuffix>lock</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Statut</mat-label>
+              <mat-select [(ngModel)]="annonce.statut">
+                <mat-option *ngFor="let s of statuts" [value]="s">{{ s }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Description</mat-label>
+              <textarea matInput [(ngModel)]="annonce.description"
+                        rows="4"
+                        placeholder="Contenu de l'annonce..."></textarea>
+              <mat-icon matSuffix>notes</mat-icon>
+            </mat-form-field>
+
+          </div>
+
+          <div class="form-actions">
+            <button mat-button (click)="showForm = false">Annuler</button>
+            <button mat-raised-button class="add-btn" (click)="saveAnnonce()">
+              <mat-icon>send</mat-icon>
+              {{ editMode ? 'Modifier' : 'Publier' }}
+            </button>
+          </div>
+
+        </mat-card-content>
+      </mat-card>
+
+      <!-- LISTE ANNONCES -->
+      <div class="annonces-grid">
+
+        <mat-card class="annonce-card-admin" *ngFor="let a of filteredAnnonces">
+          <mat-card-content>
+
+            <div class="card-header">
+              <div class="annonce-icon" [ngClass]="getTypeColor(a.type)">
+                <mat-icon>{{ a.icon || getTypeIcon(a.type) }}</mat-icon>
+              </div>
+              <div class="card-actions">
+                <button mat-icon-button color="primary"
+                        (click)="editAnnonce(a)"
+                        matTooltip="Modifier">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button
+                        (click)="archiverAnnonce(a)"
+                        matTooltip="Archiver"
+                        *ngIf="a.statut === 'Actif'">
+                  <mat-icon>inventory_2</mat-icon>
+                </button>
+                <button mat-icon-button color="warn"
+                        (click)="deleteAnnonce(a.id)"
+                        matTooltip="Supprimer">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <h3 class="annonce-titre">{{ a.titre }}</h3>
+
+            <span class="type-badge" [ngClass]="getTypeColor(a.type)">
+              <mat-icon>{{ a.icon || getTypeIcon(a.type) }}</mat-icon>
+              {{ getTypeLabel(a.type) }}
+            </span>
+
+            <p class="annonce-desc">{{ a.description }}</p>
+
+            <div class="annonce-meta">
+              <span class="info-item" *ngIf="a.role_acces">
+                <mat-icon>lock</mat-icon> Accès : {{ a.role_acces }}
+              </span>
+              <span class="info-item" *ngIf="a.created_at">
+                <mat-icon>calendar_today</mat-icon> {{ a.created_at | date:'dd/MM/yyyy' }}
+              </span>
+            </div>
+
+            <div class="card-footer">
+              <span class="statut-badge" [ngClass]="getStatutClass(a.statut)">
+                <mat-icon>{{ a.statut === 'Actif' ? 'check_circle' : 'inventory_2' }}</mat-icon>
+                {{ a.statut }}
+              </span>
+            </div>
+
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Vide -->
+        <div class="empty-msg" *ngIf="filteredAnnonces.length === 0">
+          <mat-icon>campaign</mat-icon>
+          <p>Aucune annonce trouvée.</p>
+          <button mat-raised-button class="add-btn" (click)="openForm()">
+            <mat-icon>add</mat-icon> Publier la première
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

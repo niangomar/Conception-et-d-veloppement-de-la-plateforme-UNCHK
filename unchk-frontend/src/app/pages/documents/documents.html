@@ -1,0 +1,293 @@
+<div class="dashboard-wrapper">
+
+  <!-- NAVBAR -->
+  <mat-toolbar class="navbar">
+    <div class="navbar-left">
+      <img src="logoUnchk.png" alt="Logo" class="nav-logo">
+      <span class="nav-title">UN Cheikh Hamidou Kane</span>
+    </div>
+    <div class="navbar-right">
+      <button mat-icon-button><mat-icon>notifications</mat-icon></button>
+      <span class="user-name">Admin</span>
+      <button mat-icon-button routerLink="/login"><mat-icon>logout</mat-icon></button>
+    </div>
+  </mat-toolbar>
+
+  <div class="dashboard-container">
+    <app-sidebar></app-sidebar>
+
+    <div class="main-content">
+
+      <!-- HEADER -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Gestion des Documents</h1>
+          <p class="page-subtitle">Courriers, notes, circulaires et budgets</p>
+        </div>
+        <button mat-raised-button class="add-btn" (click)="openForm()">
+          <mat-icon>add</mat-icon> Ajouter un document
+        </button>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon"><mat-icon>folder</mat-icon></div>
+          <div><h2>{{ documents.length }}</h2><p>Total documents</p></div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon"><mat-icon>check_circle</mat-icon></div>
+          <div><h2>{{ getActifs() }}</h2><p>Actifs</p></div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon"><mat-icon>move_to_inbox</mat-icon></div>
+          <div><h2>{{ getCount('Courrier arrivé') }}</h2><p>Courriers arrivés</p></div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon"><mat-icon>inventory_2</mat-icon></div>
+          <div><h2>{{ getArchives() }}</h2><p>Archivés</p></div>
+        </div>
+      </div>
+
+      <!-- FILTRES -->
+      <div class="filter-bar">
+        <button class="filter-btn" [class.active]="currentFilter === ''"
+                (click)="filterType('')">
+          <mat-icon>filter_list</mat-icon> Tous
+        </button>
+        <button class="filter-btn" [class.active]="currentFilter === 'Courrier arrivé'"
+                (click)="filterType('Courrier arrivé')">
+          <mat-icon>move_to_inbox</mat-icon> Courrier arrivé
+        </button>
+        <button class="filter-btn" [class.active]="currentFilter === 'Courrier départ'"
+                (click)="filterType('Courrier départ')">
+          <mat-icon>outbox</mat-icon> Courrier départ
+        </button>
+        <button class="filter-btn" [class.active]="currentFilter === 'Note de service'"
+                (click)="filterType('Note de service')">
+          <mat-icon>sticky_note_2</mat-icon> Notes de service
+        </button>
+        <button class="filter-btn" [class.active]="currentFilter === 'Circulaire'"
+                (click)="filterType('Circulaire')">
+          <mat-icon>campaign</mat-icon> Circulaires
+        </button>
+        <button class="filter-btn" [class.active]="currentFilter === 'Budget'"
+                (click)="filterType('Budget')">
+          <mat-icon>account_balance_wallet</mat-icon> Budget
+        </button>
+      </div>
+
+      <!-- RECHERCHE -->
+      <div class="search-bar">
+        <mat-icon>search</mat-icon>
+        <input type="text"
+               placeholder="Rechercher par titre, référence, type..."
+               [(ngModel)]="searchText"
+               (input)="filterSearch()">
+      </div>
+
+      <!-- CHARGEMENT -->
+      <div class="loading-msg" *ngIf="isLoading">
+        <mat-icon>hourglass_empty</mat-icon>
+        <p>Chargement des documents...</p>
+      </div>
+
+      <!-- FORMULAIRE -->
+      <mat-card class="form-card" *ngIf="showForm">
+        <mat-card-content>
+          <h3>
+            <mat-icon>{{ editMode ? 'edit' : 'add_circle' }}</mat-icon>
+            {{ editMode ? 'Modifier' : 'Ajouter' }} un document
+          </h3>
+
+          <div class="form-grid">
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Titre</mat-label>
+              <input matInput [(ngModel)]="document.titre"
+                     placeholder="Ex: Circulaire N°001/2026">
+              <mat-icon matSuffix>title</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Type</mat-label>
+              <mat-select [(ngModel)]="document.type">
+                <mat-option *ngFor="let t of types" [value]="t">{{ t }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Référence</mat-label>
+              <input matInput [(ngModel)]="document.reference"
+                     placeholder="Ex: REF-2026-001">
+              <mat-icon matSuffix>tag</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Date du document</mat-label>
+              <input matInput [matDatepicker]="picker"
+                     [(ngModel)]="document.dateDoc">
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Accès</mat-label>
+              <mat-select [(ngModel)]="document.roleAcces">
+                <mat-option *ngFor="let r of rolesAcces" [value]="r">{{ r }}</mat-option>
+              </mat-select>
+              <mat-icon matSuffix>lock</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Statut</mat-label>
+              <mat-select [(ngModel)]="document.statut">
+                <mat-option *ngFor="let s of statuts" [value]="s">{{ s }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Description</mat-label>
+              <textarea matInput [(ngModel)]="document.description"
+                        rows="2" placeholder="Résumé du document..."></textarea>
+              <mat-icon matSuffix>notes</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Contenu</mat-label>
+              <textarea matInput [(ngModel)]="document.contenu"
+                        rows="4" placeholder="Contenu détaillé..."></textarea>
+              <mat-icon matSuffix>description</mat-icon>
+            </mat-form-field>
+
+            <!-- FICHIER -->
+            <div class="file-upload-zone full-width">
+              <label class="file-label">
+                <mat-icon>attach_file</mat-icon>
+                <span>{{ selectedFileName || 'Joindre un fichier (PDF, Word...)' }}</span>
+                <input type="file" (change)="onFileSelected($event)"
+                       accept=".pdf,.doc,.docx,.xlsx" hidden>
+              </label>
+              <span class="file-name" *ngIf="selectedFileName">
+                <mat-icon>check_circle</mat-icon> {{ selectedFileName }}
+              </span>
+            </div>
+
+          </div>
+
+          <div class="form-actions">
+            <button mat-button (click)="showForm = false">Annuler</button>
+            <button mat-raised-button class="add-btn" (click)="saveDocument()">
+              <mat-icon>save</mat-icon>
+              {{ editMode ? 'Modifier' : 'Enregistrer' }}
+            </button>
+          </div>
+
+        </mat-card-content>
+      </mat-card>
+
+      <!-- CARDS DOCUMENTS -->
+      <div class="documents-grid" *ngIf="!isLoading">
+
+        <mat-card class="doc-card" *ngFor="let d of filteredDocuments">
+          <mat-card-content>
+
+            <!-- HEADER CARD -->
+            <div class="card-header">
+              <div class="doc-icon" [ngClass]="getTypeColor(d.type)">
+                <mat-icon>{{ getTypeIcon(d.type) }}</mat-icon>
+              </div>
+              <div class="card-actions">
+                <button mat-icon-button color="primary"
+                        (click)="editDocument(d)"
+                        matTooltip="Modifier">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button
+                        (click)="archiverDocument(d.id)"
+                        matTooltip="Archiver"
+                        *ngIf="d.statut === 'Actif'">
+                  <mat-icon>inventory_2</mat-icon>
+                </button>
+                <button mat-icon-button color="warn"
+                        (click)="deleteDocument(d.id)"
+                        matTooltip="Supprimer">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <!-- TITRE -->
+            <h3 class="doc-titre">{{ d.titre }}</h3>
+
+            <!-- BADGE TYPE -->
+            <span class="type-badge" [ngClass]="getTypeColor(d.type)">
+              <mat-icon>{{ getTypeIcon(d.type) }}</mat-icon>
+              {{ d.type }}
+            </span>
+
+            <!-- INFOS -->
+            <div class="doc-infos">
+              <div class="info-item" *ngIf="d.reference">
+                <mat-icon>tag</mat-icon>
+                <span>{{ d.reference }}</span>
+              </div>
+              <div class="info-item" *ngIf="d.date_doc">
+                <mat-icon>calendar_today</mat-icon>
+                <span>{{ d.date_doc | date:'dd/MM/yyyy' }}</span>
+              </div>
+              <div class="info-item" *ngIf="d.role_acces">
+                <mat-icon>lock</mat-icon>
+                <span>Accès : {{ d.role_acces }}</span>
+              </div>
+              <div class="info-item" *ngIf="d.description">
+                <mat-icon>notes</mat-icon>
+                <span>{{ d.description }}</span>
+              </div>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="card-footer">
+              <span class="statut-badge" [ngClass]="getStatutClass(d.statut)">
+                <mat-icon>{{ d.statut === 'Actif' ? 'check_circle' : 'inventory_2' }}</mat-icon>
+                {{ d.statut }}
+              </span>
+
+              <!-- Bouton télécharger le vrai fichier -->
+              <button mat-raised-button class="download-btn"
+                      *ngIf="d.fichier_url"
+                      (click)="ouvrirFichier(d)"
+                      matTooltip="Télécharger le fichier">
+                <mat-icon>download</mat-icon> Télécharger
+              </button>
+
+              <!-- Bouton générer PDF de la fiche -->
+              <button mat-stroked-button class="pdf-btn"
+                      (click)="telecharger(d)"
+                      matTooltip="Générer fiche PDF">
+                <mat-icon>picture_as_pdf</mat-icon> Fiche PDF
+              </button>
+
+              <!-- Message si pas de fichier -->
+              <span class="no-file-msg" *ngIf="!d.fichier_url">
+                <mat-icon>schedule</mat-icon> Disponible prochainement
+              </span>
+
+            </div>
+
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Message si vide -->
+        <div class="empty-msg" *ngIf="filteredDocuments.length === 0 && !isLoading">
+          <mat-icon>folder_open</mat-icon>
+          <p>Aucun document trouvé.</p>
+          <button mat-raised-button class="add-btn" (click)="openForm()">
+            <mat-icon>add</mat-icon> Ajouter le premier
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

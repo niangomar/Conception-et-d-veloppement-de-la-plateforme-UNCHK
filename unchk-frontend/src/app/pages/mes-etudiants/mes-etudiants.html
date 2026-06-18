@@ -1,0 +1,136 @@
+<div class="app-wrapper">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <img src="logoUnchk.png" alt="Logo" class="nav-logo">
+      <span class="nav-title">UN Cheikh Hamidou Kane</span>
+    </div>
+    <div class="menu-label">MENU FORMATEUR</div>
+    <a class="menu-item" routerLink="/dashboard-formateur" routerLinkActive="active"><mat-icon>home</mat-icon><span>Tableau de bord</span></a>
+    <a class="menu-item" routerLink="/mes-cours" routerLinkActive="active"><mat-icon>menu_book</mat-icon><span>Mes cours</span></a>
+    <a class="menu-item" routerLink="/emploi-du-temps-formateur" routerLinkActive="active"><mat-icon>calendar_today</mat-icon><span>Emploi du temps</span></a>
+    <a class="menu-item" routerLink="/mes-etudiants" routerLinkActive="active"><mat-icon>groups</mat-icon><span>Mes étudiants</span></a>
+    <a class="menu-item" routerLink="/devoirs-formateur" routerLinkActive="active"><mat-icon>assignment</mat-icon><span>Devoirs & Examens</span></a>
+    <a class="menu-item" routerLink="/documents-formateur" routerLinkActive="active"><mat-icon>upload_file</mat-icon><span>Déposer documents</span></a>    <a class="menu-item" routerLink="/annonces-formateur"routerLinkActive="active"><mat-icon>campaign</mat-icon><span>Annonces</span></a>
+    <a class="menu-item" routerLink="/mon-profil-formateur"routerLinkActive="active"><mat-icon>person</mat-icon><span>Mon profil</span></a>
+    <div class="sidebar-footer">
+      <div class="year-badge">
+        <mat-icon>school</mat-icon>
+        <div><small>Année universitaire</small><strong>2025 - 2026</strong></div>
+      </div>
+      <a class="menu-item logout" routerLink="/login"><mat-icon>logout</mat-icon><span>Déconnexion</span></a>
+    </div>
+  </div>
+
+  <!-- CONTENU -->
+  <div class="main-content">
+    <div class="topbar">
+      <h2>Mes étudiants</h2>
+      <div class="topbar-right">
+        <div class="notif-btn"><mat-icon>notifications</mat-icon><span class="badge">2</span></div>
+        <div class="user-info">
+          <div class="avatar">{{ prenomUtilisateur[0] }}{{ nomUtilisateur[0] }}</div>
+          <span>{{ prenomUtilisateur }} {{ nomUtilisateur }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="body-content">
+      <div class="welcome">
+        <h1>👩‍🎓 Mes étudiants</h1>
+        <p>Suivez les performances et la présence de vos étudiants</p>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon"><mat-icon>groups</mat-icon></div>
+          <div class="stat-info"><h2>{{ etudiants.length }}</h2><p>Étudiants</p><small>au total</small></div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon"><mat-icon>check_circle</mat-icon></div>
+          <div class="stat-info"><h2>{{ nbActifs }}</h2><p>Actifs</p><small>ce semestre</small></div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon"><mat-icon>warning</mat-icon></div>
+          <div class="stat-info"><h2>{{ nbAlertes }}</h2><p>En alerte</p><small>suivi requis</small></div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon"><mat-icon>star</mat-icon></div>
+          <div class="stat-info"><h2>{{ moyenneGene }}</h2><p>Moyenne générale</p><small>/20</small></div>
+        </div>
+      </div>
+
+      <!-- Filtres & Recherche -->
+      <div class="filtres-section">
+        <div class="search-box">
+          <mat-icon>search</mat-icon>
+          <input type="text" placeholder="Rechercher un étudiant..." (input)="onRecherche($event)">
+        </div>
+        <div class="filtres-bar">
+          <button [class.actif]="filtreFormation === 'tous'" (click)="filtrerFormation('tous')">Tous</button>
+          <button *ngFor="let f of formations"
+                  [class.actif]="filtreFormation === f"
+                  (click)="filtrerFormation(f)">{{ f }}</button>
+        </div>
+      </div>
+
+      <!-- Liste étudiants -->
+      <div class="etudiants-grid">
+        <div class="etudiant-card" *ngFor="let e of etudiantsFiltres">
+
+          <div class="etudiant-header" [ngClass]="'header-' + e.color">
+            <div class="etudiant-avatar">{{ e.avatar }}</div>
+            <div class="etudiant-identity">
+              <strong>{{ e.prenom }} {{ e.nom }}</strong>
+              <span>{{ e.formation }}</span>
+            </div>
+            <div class="statut-badge" [ngClass]="'statut-' + e.statut">
+              {{ getStatutLabel(e.statut) }}
+            </div>
+          </div>
+
+          <div class="etudiant-body">
+            <div class="perf-item">
+              <div class="perf-label">
+                <span>Moyenne</span>
+                <span class="perf-val" [class.ok]="e.moyenne >= 10" [class.warn]="e.moyenne < 10">
+                  {{ e.moyenne }}/20
+                </span>
+              </div>
+              <div class="perf-bar">
+                <div class="perf-fill" [ngClass]="'fill-' + e.color"
+                     [style.width.%]="(e.moyenne / 20) * 100"></div>
+              </div>
+            </div>
+
+            <div class="perf-item">
+              <div class="perf-label">
+                <span>Présence</span>
+                <span class="perf-val" [class.ok]="e.presence >= 75" [class.warn]="e.presence < 75">
+                  {{ e.presence }}%
+                </span>
+              </div>
+              <div class="perf-bar">
+                <div class="perf-fill" [ngClass]="'fill-' + e.color"
+                     [style.width.%]="e.presence"></div>
+              </div>
+            </div>
+
+            <div class="etudiant-actions">
+              <button class="btn-action" [ngClass]="'btn-' + e.color">
+                <mat-icon>grade</mat-icon> Notes
+              </button>
+              <button class="btn-action btn-outline" (click)="envoyerMessage(e)">
+                <mat-icon>message</mat-icon> Message
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

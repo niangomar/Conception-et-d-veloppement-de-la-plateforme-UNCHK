@@ -1,0 +1,118 @@
+<!-- inscription.component.html -->
+<div class="register-wrapper">
+
+  <!-- ══ GAUCHE : image étudiant afro + laptop ══ -->
+  <div class="register-left">
+    <div class="overlay"></div>
+    <div class="left-content">
+
+      <div class="logo-container">
+        <img src="logoUnchk.png" alt="Logo UNCHK" class="logo">
+      </div>
+
+      <div class="left-text">
+        <h1>Rejoignez-nous !</h1>
+        <h2>Université Numérique<br>Cheikh Hamidou Kane</h2>
+        <div class="left-divider"></div>
+        <p>Créez votre compte et accédez à une plateforme dédiée à l'excellence académique et à l'innovation pédagogique.</p>
+      </div>
+
+      <div class="bottom-card">
+        <mat-icon>school</mat-icon>
+        <div>
+          <strong>Une plateforme dédiée à l'excellence</strong>
+          <small>académique et à l'innovation pédagogique.</small>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ DROITE : formulaire ══ -->
+  <div class="register-right">
+
+
+    <div class="form-wrapper">
+      <div class="form-card">
+
+        <div class="form-icon">
+          <mat-icon>person_add</mat-icon>
+        </div>
+
+        <h2>Inscription</h2>
+        <p class="subtitle">Créez votre espace personnel</p>
+
+        <!-- Nom + Prénom -->
+        <div class="name-row">
+          <div class="input-group">
+            <div class="input-wrap">
+              <mat-icon class="input-icon">person</mat-icon>
+              <input type="text" placeholder="Nom" [(ngModel)]="user.nom" name="nom" />
+            </div>
+          </div>
+          <div class="input-group">
+            <div class="input-wrap">
+              <mat-icon class="input-icon">person</mat-icon>
+              <input type="text" placeholder="Prénom" [(ngModel)]="user.prenom" name="prenom" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="input-group">
+          <div class="input-wrap">
+            <mat-icon class="input-icon">email</mat-icon>
+            <input type="email" placeholder="Adresse email" [(ngModel)]="user.email" name="email" />
+            <mat-icon class="input-suffix">mail_outline</mat-icon>
+          </div>
+          <p class="input-hint">Utilisez votre email institutionnel @unchk.sn</p>
+        </div>
+
+        <!-- Rôle -->
+        <div class="input-group">
+          <div class="input-wrap">
+            <mat-icon class="input-icon">badge</mat-icon>
+            <select [(ngModel)]="user.role" name="role">
+              <option value="" disabled selected>Rôle</option>
+              <option value="etudiant">Étudiant</option>
+              <option value="formateur">Formateur</option>
+              <option value="admin">Administrateur</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Mot de passe -->
+        <div class="input-group">
+          <div class="input-wrap">
+            <mat-icon class="input-icon">lock</mat-icon>
+            <input [type]="showPassword ? 'text' : 'password'" placeholder="Mot de passe"
+                   [(ngModel)]="user.motDePasse" name="motDePasse" />
+            <mat-icon class="input-suffix" (click)="showPassword = !showPassword">
+              {{ showPassword ? 'visibility_off' : 'visibility' }}
+            </mat-icon>
+          </div>
+        </div>
+
+        <!-- Confirmer MDP -->
+        <div class="input-group">
+          <div class="input-wrap">
+            <mat-icon class="input-icon">lock_outline</mat-icon>
+            <input [type]="showConfirm ? 'text' : 'password'" placeholder="Confirmer mot de passe"
+                   [(ngModel)]="confirmerMotDePasse" name="confirmerMotDePasse" />
+            <mat-icon class="input-suffix" (click)="showConfirm = !showConfirm">
+              {{ showConfirm ? 'visibility_off' : 'visibility' }}
+            </mat-icon>
+          </div>
+        </div>
+
+        <button class="register-btn" (click)="inscrire()">→ S'inscrire</button>
+
+        <p class="login-link">
+          Déjà un compte ? <a routerLink="/login">Se connecter →</a>
+        </p>
+
+      </div>
+    </div>
+  </div>
+
+</div>

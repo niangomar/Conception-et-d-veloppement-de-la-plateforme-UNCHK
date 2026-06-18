@@ -1,0 +1,317 @@
+<div class="dashboard-wrapper">
+  <mat-toolbar class="navbar">
+    <div class="navbar-left">
+      <img src="logoUnchk.png" alt="Logo" class="nav-logo">
+      <span class="nav-title">UN Cheikh Hamidou Kane</span>
+    </div>
+    <div class="navbar-right">
+      <button mat-icon-button>
+        <mat-icon>notifications</mat-icon>
+      </button>
+      <span class="user-name">Admin</span>
+      <button mat-icon-button routerLink="/login">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
+  </mat-toolbar>
+
+  <div class="dashboard-container">
+    <!-- APRÈS (juste une ligne) -->
+    <app-sidebar></app-sidebar>
+
+
+    <div class="main-content">
+      <h1 class="page-title">Appui à l'Insertion Professionnelle</h1>
+      <p class="page-subtitle">Suivi des stages, emplois et partenaires</p>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <mat-icon>work</mat-icon>
+          <div>
+            <h2>65%</h2>
+            <p>Emploi salarié</p>
+          </div>
+        </div>
+        <div class="stat-card green">
+          <mat-icon>store</mat-icon>
+          <div>
+            <h2>20%</h2>
+            <p>Auto-emploi</p>
+          </div>
+        </div>
+        <div class="stat-card orange">
+          <mat-icon>school</mat-icon>
+          <div>
+            <h2>15%</h2>
+            <p>Poursuite études</p>
+          </div>
+        </div>
+        <div class="stat-card purple">
+          <mat-icon>handshake</mat-icon>
+          <div>
+            <h2>{{ partenaires.length }}</h2>
+            <p>Partenaires</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Onglets -->
+      <div class="tabs">
+        <button class="tab" [class.active]="activeTab === 'stages'" (click)="activeTab='stages'">
+          <mat-icon>badge</mat-icon> Stages
+        </button>
+        <button class="tab" [class.active]="activeTab === 'insertion'" (click)="activeTab='insertion'">
+          <mat-icon>work</mat-icon> Insertion Pro
+        </button>
+        <button class="tab" [class.active]="activeTab === 'partenaires'" (click)="activeTab='partenaires'">
+          <mat-icon>handshake</mat-icon> Partenaires
+        </button>
+      </div>
+
+      <!-- ONGLET STAGES -->
+      <div *ngIf="activeTab === 'stages'">
+        <div class="tab-header">
+          <h2>Suivi des stages</h2>
+          <button mat-raised-button class="add-btn" (click)="openStageForm()">
+            <mat-icon>add</mat-icon> Ajouter un stage
+          </button>
+        </div>
+
+        <mat-card class="form-card" [hidden]="!showStageForm">
+          <mat-card-content>
+            <h3>{{ stageEditMode ? 'Modifier' : 'Ajouter' }} un stage</h3>
+            <div class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Nom étudiant</mat-label>
+                <input matInput [(ngModel)]="stage.etudiantNom">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Entreprise</mat-label>
+                <input matInput [(ngModel)]="stage.entreprise">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Poste</mat-label>
+                <input matInput [(ngModel)]="stage.poste">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Date début</mat-label>
+                <input matInput type="date" [(ngModel)]="stage.dateDebut">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Date fin</mat-label>
+                <input matInput type="date" [(ngModel)]="stage.dateFin">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Note (/20)</mat-label>
+                <input matInput type="number" [(ngModel)]="stage.note" min="0" max="20">
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="full-col">
+                <mat-label>Bilan du stage</mat-label>
+                <textarea matInput [(ngModel)]="stage.bilan" rows="3"></textarea>
+              </mat-form-field>
+            </div>
+            <div class="form-actions">
+              <button mat-button (click)="showStageForm=false">Annuler</button>
+              <button mat-raised-button class="add-btn" (click)="saveStage()">
+                {{ stageEditMode ? 'Modifier' : 'Enregistrer' }}
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="table-card">
+          <mat-card-content>
+            <table mat-table [dataSource]="stages" class="full-width">
+              <ng-container matColumnDef="etudiant">
+                <th mat-header-cell *matHeaderCellDef>Étudiant</th>
+                <td mat-cell *matCellDef="let s">{{ s.etudiantNom }}</td>
+              </ng-container>
+              <ng-container matColumnDef="entreprise">
+                <th mat-header-cell *matHeaderCellDef>Entreprise</th>
+                <td mat-cell *matCellDef="let s">{{ s.entreprise }}</td>
+              </ng-container>
+              <ng-container matColumnDef="poste">
+                <th mat-header-cell *matHeaderCellDef>Poste</th>
+                <td mat-cell *matCellDef="let s">{{ s.poste }}</td>
+              </ng-container>
+              <ng-container matColumnDef="dateDebut">
+                <th mat-header-cell *matHeaderCellDef>Début</th>
+                <td mat-cell *matCellDef="let s">{{ s.dateDebut }}</td>
+              </ng-container>
+              <ng-container matColumnDef="dateFin">
+                <th mat-header-cell *matHeaderCellDef>Fin</th>
+                <td mat-cell *matCellDef="let s">{{ s.dateFin }}</td>
+              </ng-container>
+              <ng-container matColumnDef="note">
+                <th mat-header-cell *matHeaderCellDef>Note</th>
+                <td mat-cell *matCellDef="let s">
+                  <span class="note-badge">{{ s.note }}/20</span>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let s">
+                  <button mat-icon-button color="primary" (click)="editStage(s)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button color="warn" (click)="deleteStage(s.id)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="stageColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: stageColumns;"></tr>
+            </table>
+            <p class="empty-msg" [hidden]="stages.length > 0">Aucun stage enregistré.</p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- ONGLET INSERTION PRO -->
+      <div *ngIf="activeTab === 'insertion'">
+        <div class="tab-header">
+          <h2>Insertion professionnelle</h2>
+          <button mat-raised-button class="add-btn" (click)="openInsertionForm()">
+            <mat-icon>add</mat-icon> Ajouter
+          </button>
+        </div>
+
+        <mat-card class="form-card" [hidden]="!showInsertionForm">
+          <mat-card-content>
+            <h3>Ajouter une insertion</h3>
+            <div class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Nom étudiant</mat-label>
+                <input matInput [(ngModel)]="insertion.etudiantNom">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Type</mat-label>
+                <mat-select [(ngModel)]="insertion.type">
+                  <mat-option value="emploi_salarie">Emploi salarié</mat-option>
+                  <mat-option value="auto_emploi">Auto-emploi</mat-option>
+                  <mat-option value="poursuite_etudes">Poursuite d'études</mat-option>
+                  <mat-option value="autre">Autre</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Entreprise / Structure</mat-label>
+                <input matInput [(ngModel)]="insertion.entreprise">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Poste</mat-label>
+                <input matInput [(ngModel)]="insertion.poste">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Date de prise de poste</mat-label>
+                <input matInput type="date" [(ngModel)]="insertion.dateDebut">
+              </mat-form-field>
+            </div>
+            <div class="form-actions">
+              <button mat-button (click)="showInsertionForm=false">Annuler</button>
+              <button mat-raised-button class="add-btn" (click)="saveInsertion()">
+                Enregistrer
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <div class="insertion-grid">
+          <mat-card class="insertion-card" *ngFor="let ins of insertions">
+            <mat-card-content>
+              <div class="insertion-header">
+                <div class="insertion-type" [class]="ins.type">
+                  {{ getInsertionLabel(ins.type) }}
+                </div>
+                <button mat-icon-button color="warn" (click)="deleteInsertion(ins.id)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+              <h3>{{ ins.etudiantNom }}</h3>
+              <p><mat-icon>business</mat-icon> {{ ins.entreprise }}</p>
+              <p><mat-icon>work</mat-icon> {{ ins.poste }}</p>
+              <p><mat-icon>calendar_today</mat-icon> {{ ins.dateDebut }}</p>
+            </mat-card-content>
+          </mat-card>
+          <p class="empty-msg" *ngIf="insertions.length === 0">Aucune insertion enregistrée.</p>
+        </div>
+      </div>
+
+      <!-- ONGLET PARTENAIRES -->
+      <div *ngIf="activeTab === 'partenaires'">
+        <div class="tab-header">
+          <h2>Partenaires</h2>
+          <button mat-raised-button class="add-btn" (click)="openPartenaireForm()">
+            <mat-icon>add</mat-icon> Ajouter un partenaire
+          </button>
+        </div>
+
+        <mat-card class="form-card" [hidden]="!showPartenaireForm">
+          <mat-card-content>
+            <h3>Ajouter un partenaire</h3>
+            <div class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Nom</mat-label>
+                <input matInput [(ngModel)]="partenaire.nom">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Type</mat-label>
+                <mat-select [(ngModel)]="partenaire.type">
+                  <mat-option value="entreprise">Entreprise</mat-option>
+                  <mat-option value="institution">Institution</mat-option>
+                  <mat-option value="ong">ONG</mat-option>
+                  <mat-option value="autre">Autre</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Domaine</mat-label>
+                <input matInput [(ngModel)]="partenaire.domaine">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Contact</mat-label>
+                <input matInput [(ngModel)]="partenaire.contactNom">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Téléphone</mat-label>
+                <input matInput [(ngModel)]="partenaire.telephone">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Email</mat-label>
+                <input matInput [(ngModel)]="partenaire.email">
+              </mat-form-field>
+            </div>
+            <div class="form-actions">
+              <button mat-button (click)="showPartenaireForm=false">Annuler</button>
+              <button mat-raised-button class="add-btn" (click)="savePartenaire()">
+                Enregistrer
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <div class="partenaires-grid">
+          <mat-card class="partenaire-card" *ngFor="let p of partenaires">
+            <mat-card-content>
+              <div class="partenaire-header">
+                <div class="partenaire-icon">
+                  <mat-icon>business</mat-icon>
+                </div>
+                <button mat-icon-button color="warn" (click)="deletePartenaire(p.id)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+              <h3>{{ p.nom }}</h3>
+              <span class="partenaire-type">{{ p.type }}</span>
+              <p><mat-icon>category</mat-icon> {{ p.domaine }}</p>
+              <p><mat-icon>person</mat-icon> {{ p.contactNom }}</p>
+              <p><mat-icon>phone</mat-icon> {{ p.telephone }}</p>
+              <p><mat-icon>email</mat-icon> {{ p.email }}</p>
+            </mat-card-content>
+          </mat-card>
+          <p class="empty-msg" *ngIf="partenaires.length === 0">Aucun partenaire enregistré.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,370 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ── NAVBAR ──────────────────────────────────────── */
+.navbar {
+  background: linear-gradient(135deg, #1a3a5c, #2196F3) !important;
+  color: white !important;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: 64px !important;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-logo {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: white;
+  padding: 4px;
+  object-fit: contain;
+}
+
+.nav-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: white;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: white;
+}
+
+/* ── LAYOUT ──────────────────────────────────────── */
+.dashboard-container {
+  display: flex;
+  margin-top: 64px;
+  min-height: calc(100vh - 64px);
+}
+
+.main-content {
+  margin-left: 250px;
+  padding: 30px;
+  flex: 1;
+  background: #f5f7fa;
+}
+
+/* ── PAGE HEADER ─────────────────────────────────── */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a2744;
+  margin: 0;
+}
+
+.page-subtitle {
+  color: #888;
+  margin: 4px 0 0;
+  font-size: 14px;
+}
+
+.add-btn {
+  background: #1976D2 !important;
+  color: white !important;
+  border-radius: 8px !important;
+  padding: 0 20px !important;
+  height: 42px;
+  font-weight: 600 !important;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── STATS ───────────────────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.stat-card.blue   { background: linear-gradient(135deg, #1976D2, #42A5F5); }
+.stat-card.green  { background: linear-gradient(135deg, #388E3C, #66BB6A); }
+.stat-card.orange { background: linear-gradient(135deg, #F57C00, #FFA726); }
+.stat-card.purple { background: linear-gradient(135deg, #7B1FA2, #AB47BC); }
+
+.stat-icon {
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-card h2 {
+  font-size: 28px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.stat-card p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+/* ── RECHERCHE ───────────────────────────────────── */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: white;
+  border-radius: 10px;
+  padding: 10px 16px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.search-bar mat-icon { color: #aaa; }
+
+.search-bar input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 14px;
+  background: transparent;
+  color: #333;
+}
+
+/* ── FORMULAIRE ──────────────────────────────────── */
+.form-card {
+  margin-bottom: 24px;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1) !important;
+}
+
+.form-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a2744;
+  margin-bottom: 20px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.full-width { grid-column: 1 / -1; }
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* ── CARDS UTILISATEURS ──────────────────────────── */
+.utilisateurs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.utilisateur-card {
+  border-radius: 12px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.utilisateur-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12) !important;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+/* ── AVATAR (couleur selon rôle) ─────────────────── */
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1976D2, #42A5F5); /* défaut */
+}
+
+.avatar.role-admin         { background: linear-gradient(135deg, #c62828, #ef5350); }
+.avatar.role-etudiant      { background: linear-gradient(135deg, #1565c0, #42A5F5); }
+.avatar.role-enseignant    { background: linear-gradient(135deg, #2e7d32, #66BB6A); }
+.avatar.role-tuteur        { background: linear-gradient(135deg, #e65100, #FFA726); }
+.avatar.role-responsable   { background: linear-gradient(135deg, #6a1b9a, #AB47BC); }
+.avatar.role-administratif { background: linear-gradient(135deg, #00695c, #26A69A); }
+
+/* ── NOM ─────────────────────────────────────────── */
+.utilisateur-nom {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a2744;
+  margin: 0 0 8px;
+}
+
+/* ── ROLE BADGE ──────────────────────────────────── */
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: white;
+  margin-bottom: 12px;
+  background: #90a4ae; /* défaut */
+}
+
+.role-badge.role-admin         { background: #e53935; }
+.role-badge.role-etudiant      { background: #1976D2; }
+.role-badge.role-enseignant    { background: #388E3C; }
+.role-badge.role-tuteur        { background: #F57C00; }
+.role-badge.role-responsable   { background: #7B1FA2; }
+.role-badge.role-administratif { background: #00695c; }
+
+.role-badge mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+/* ── INFOS ───────────────────────────────────────── */
+.utilisateur-infos {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #555;
+}
+
+.info-item mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: #1976D2;
+  flex-shrink: 0;
+}
+
+/* ── CARD FOOTER ─────────────────────────────────── */
+.card-footer {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 10px;
+  margin-top: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ── ACTIF BADGE ─────────────────────────────────── */
+.actif-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.actif-badge mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+.actif-badge.actif   { background: #E8F5E9; color: #2E7D32; }
+.actif-badge.inactif { background: #FFEBEE; color: #C62828; }
+
+/* ── TOGGLE BUTTON ───────────────────────────────── */
+.toggle-btn {
+  border-radius: 8px !important;
+  font-size: 12px !important;
+  padding: 0 10px !important;
+  height: 32px !important;
+}
+
+/* ── MESSAGE VIDE ────────────────────────────────── */
+.empty-msg {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  color: #aaa;
+}
+
+.empty-msg mat-icon {
+  font-size: 60px;
+  width: 60px;
+  height: 60px;
+  margin-bottom: 12px;
+}
+
+.empty-msg p {
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+/* ── SNACKBAR ────────────────────────────────────── */
+.snack-success { background: #2e7d32 !important; color: white !important; }
+.snack-warning { background: #e65100 !important; color: white !important; }

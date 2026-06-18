@@ -1,0 +1,136 @@
+<div class="app-wrapper">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <img src="logoUnchk.png" alt="Logo" class="nav-logo">
+      <span class="nav-title">UN Cheikh Hamidou Kane</span>
+    </div>
+    <div class="menu-label">MENU FORMATEUR</div>
+    <a class="menu-item" routerLink="/dashboard-formateur" routerLinkActive="active"><mat-icon>home</mat-icon><span>Tableau de bord</span></a>
+    <a class="menu-item" routerLink="/mes-cours" routerLinkActive="active"><mat-icon>menu_book</mat-icon><span>Mes cours</span></a>
+    <a class="menu-item" routerLink="/emploi-du-temps-formateur" routerLinkActive="active"><mat-icon>calendar_today</mat-icon><span>Emploi du temps</span></a>
+    <a class="menu-item" routerLink="/mes-etudiants" routerLinkActive="active"><mat-icon>groups</mat-icon><span>Mes étudiants</span></a>
+    <a class="menu-item" routerLink="/devoirs-formateur" routerLinkActive="active"><mat-icon>assignment</mat-icon><span>Devoirs & Examens</span></a>
+    <a class="menu-item" routerLink="/documents-formateur" routerLinkActive="active"><mat-icon>upload_file</mat-icon><span>Déposer documents</span></a>    <a class="menu-item" routerLink="/annonces" routerLinkActive="active"><mat-icon>campaign</mat-icon><span>Annonces</span></a>
+    <a class="menu-item" routerLink="/mon-profil" routerLinkActive="active"><mat-icon>person</mat-icon><span>Mon profil</span></a>
+    <div class="sidebar-footer">
+      <div class="year-badge">
+        <mat-icon>school</mat-icon>
+        <div><small>Année universitaire</small><strong>2025 - 2026</strong></div>
+      </div>
+      <a class="menu-item logout" routerLink="/login"><mat-icon>logout</mat-icon><span>Déconnexion</span></a>
+    </div>
+  </div>
+
+  <!-- CONTENU -->
+  <div class="main-content">
+    <div class="topbar">
+      <h2>Emploi du temps</h2>
+      <div class="topbar-right">
+        <div class="notif-btn"><mat-icon>notifications</mat-icon><span class="badge">2</span></div>
+        <div class="user-info">
+          <div class="avatar">{{ prenomUtilisateur[0] }}{{ nomUtilisateur[0] }}</div>
+          <span>{{ prenomUtilisateur }} {{ nomUtilisateur }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="body-content">
+      <div class="welcome">
+        <h1>📅 Emploi du temps</h1>
+        <p>{{ semaineActuelle }}</p>
+      </div>
+
+      <!-- Navigation semaine -->
+      <div class="semaine-nav">
+        <button class="nav-btn"><mat-icon>chevron_left</mat-icon> Semaine précédente</button>
+        <span class="semaine-label">{{ semaineActuelle }}</span>
+        <button class="nav-btn">Semaine suivante <mat-icon>chevron_right</mat-icon></button>
+      </div>
+
+      <!-- Légende -->
+      <div class="legende">
+        <div class="legende-item"><span class="dot blue"></span> Algorithmique</div>
+        <div class="legende-item"><span class="dot green"></span> Base de données</div>
+        <div class="legende-item"><span class="dot purple"></span> Structures de données</div>
+        <div class="legende-sep"></div>
+        <div class="legende-item"><span class="type-dot cm"></span> CM — Cours Magistral</div>
+        <div class="legende-item"><span class="type-dot td"></span> TD — Travaux Dirigés</div>
+        <div class="legende-item"><span class="type-dot tp"></span> TP — Travaux Pratiques</div>
+      </div>
+
+      <!-- Grille EDT -->
+      <div class="edt-grid">
+        <div class="edt-col" *ngFor="let jour of jours">
+
+          <!-- En-tête jour -->
+          <div class="jour-header" [class.today]="jour === 'Lundi'">
+            <strong>{{ jour }}</strong>
+            <small>{{ getSeancesByJour(jour)[0]?.date || '' }}</small>
+          </div>
+
+          <!-- Séances du jour -->
+          <div class="seances-col">
+            <div *ngIf="getSeancesByJour(jour).length === 0" class="jour-libre">
+              <mat-icon>weekend</mat-icon>
+              <span>Libre</span>
+            </div>
+
+            <div class="seance-card" *ngFor="let s of getSeancesByJour(jour)"
+                 [ngClass]="'seance-' + s.color">
+              <div class="seance-header">
+                <span class="seance-heure">{{ s.heure }}</span>
+                <span class="seance-type" [ngClass]="'type-' + s.type.toLowerCase()">{{ s.type }}</span>
+              </div>
+              <div class="seance-body">
+                <strong>{{ s.cours }}</strong>
+                <div class="seance-info">
+                  <span><mat-icon>school</mat-icon> {{ s.formation }}</span>
+                  <span><mat-icon>room</mat-icon> {{ s.salle }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Récapitulatif semaine -->
+      <div class="recap-card">
+        <h3>📊 Récapitulatif de la semaine</h3>
+        <div class="recap-grid">
+          <div class="recap-item">
+            <mat-icon style="color:#2196F3">event</mat-icon>
+            <div>
+              <strong>{{ seances.length }}</strong>
+              <small>Séances cette semaine</small>
+            </div>
+          </div>
+          <div class="recap-item">
+            <mat-icon style="color:#4CAF50">schedule</mat-icon>
+            <div>
+              <strong>12h</strong>
+              <small>Volume horaire total</small>
+            </div>
+          </div>
+          <div class="recap-item">
+            <mat-icon style="color:#FF9800">groups</mat-icon>
+            <div>
+              <strong>87</strong>
+              <small>Étudiants à encadrer</small>
+            </div>
+          </div>
+          <div class="recap-item">
+            <mat-icon style="color:#9C27B0">menu_book</mat-icon>
+            <div>
+              <strong>3</strong>
+              <small>Matières différentes</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

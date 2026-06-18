@@ -1,0 +1,155 @@
+<div class="app-wrapper">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <img src="logoUnchk.png" alt="Logo" class="nav-logo">
+      <span class="nav-title">UN Cheikh Hamidou Kane</span>
+    </div>
+    <div class="menu-label">MENU ÉTUDIANT</div>
+    <a class="menu-item" routerLink="/dashboard-etudiant" routerLinkActive="active">
+      <mat-icon>home</mat-icon><span>Tableau de bord</span>
+    </a>
+    <a class="menu-item" routerLink="/emploi-du-temps" routerLinkActive="active">
+      <mat-icon>calendar_today</mat-icon><span>Emploi du temps</span>
+    </a>
+    <a class="menu-item" routerLink="/mes-devoirs" routerLinkActive="active">
+      <mat-icon>assignment</mat-icon><span>Mes devoirs</span>
+    </a>
+    <a class="menu-item" routerLink="/examens-etudiant" routerLinkActive="active">
+      <mat-icon>quiz</mat-icon><span>Examens</span>
+    </a>
+    <a class="menu-item" routerLink="/mes-documents" routerLinkActive="active">
+      <mat-icon>description</mat-icon><span>Mes documents</span>
+    </a>
+    <a class="menu-item" routerLink="/annonces" routerLinkActive="active">
+      <mat-icon>campaign</mat-icon><span>Annonces</span>
+    </a>
+    <a class="menu-item" routerLink="/mon-profil" routerLinkActive="active">
+      <mat-icon>person</mat-icon><span>Mon profil</span>
+    </a>
+    <div class="sidebar-footer">
+      <div class="year-badge">
+        <mat-icon>school</mat-icon>
+        <div>
+          <small>Année universitaire</small>
+          <strong>2025 - 2026</strong>
+        </div>
+      </div>
+      <a class="menu-item logout" routerLink="/login">
+        <mat-icon>logout</mat-icon><span>Déconnexion</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Contenu principal -->
+  <div class="main-content">
+    <div class="topbar">
+      <h2>Annonces</h2>
+      <div class="topbar-right">
+        <div class="notif-btn">
+          <mat-icon>notifications</mat-icon>
+          <span class="badge">3</span>
+        </div>
+        <div class="user-info">
+          <div class="avatar">{{ prenomUtilisateur[0] }}{{ nomUtilisateur[0] }}</div>
+          <span>{{ prenomUtilisateur }} {{ nomUtilisateur }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="body-content">
+      <div class="welcome">
+        <h1>Annonces</h1>
+        <p>Restez informé des dernières actualités</p>
+      </div>
+
+      <!-- Cartes stats cliquables -->
+      <div class="stats-grid">
+
+        <div class="stat-card red clickable" (click)="ouvrirCategorie('exam')" title="Aller aux examens">
+          <div class="stat-icon"><mat-icon>event</mat-icon></div>
+          <div class="stat-info">
+            <h2>{{ nbExamens }}</h2>
+            <p>Examens</p>
+          </div>
+          <mat-icon class="stat-arrow">arrow_forward</mat-icon>
+        </div>
+
+        <div class="stat-card blue clickable" (click)="ouvrirCategorie('doc')" title="Aller aux documents">
+          <div class="stat-icon"><mat-icon>description</mat-icon></div>
+          <div class="stat-info">
+            <h2>{{ nbDocuments }}</h2>
+            <p>Documents</p>
+          </div>
+          <mat-icon class="stat-arrow">arrow_forward</mat-icon>
+        </div>
+
+        <div class="stat-card green clickable" (click)="filtrer('reunion')" title="Filtrer les réunions">
+          <div class="stat-icon"><mat-icon>groups</mat-icon></div>
+          <div class="stat-info">
+            <h2>{{ nbReunions }}</h2>
+            <p>Réunions</p>
+          </div>
+          <mat-icon class="stat-arrow">filter_list</mat-icon>
+        </div>
+
+        <div class="stat-card orange clickable" (click)="filtrer('info')" title="Filtrer les infos">
+          <div class="stat-icon"><mat-icon>info</mat-icon></div>
+          <div class="stat-info">
+            <h2>{{ nbInfos }}</h2>
+            <p>Infos</p>
+          </div>
+          <mat-icon class="stat-arrow">filter_list</mat-icon>
+        </div>
+
+      </div>
+
+      <!-- Filtres -->
+      <div class="filtres">
+        <button [class.actif]="filtreActif === 'tous'" (click)="filtrer('tous')">
+          <mat-icon>list</mat-icon> Toutes
+        </button>
+        <button [class.actif]="filtreActif === 'exam'" (click)="filtrer('exam')">
+          <mat-icon>event</mat-icon> Examens
+        </button>
+        <button [class.actif]="filtreActif === 'doc'" (click)="filtrer('doc')">
+          <mat-icon>description</mat-icon> Documents
+        </button>
+        <button [class.actif]="filtreActif === 'reunion'" (click)="filtrer('reunion')">
+          <mat-icon>groups</mat-icon> Réunions
+        </button>
+        <button [class.actif]="filtreActif === 'info'" (click)="filtrer('info')">
+          <mat-icon>info</mat-icon> Infos
+        </button>
+      </div>
+
+      <!-- Liste annonces -->
+      <div class="card">
+        <div class="card-header">
+          <h3>{{ annoncesFiltrees.length }} annonce(s)</h3>
+        </div>
+        <div class="annonces-list">
+          @for (a of annoncesFiltrees; track a.titre) {
+          <div class="annonce-item clickable" (click)="ouvrirAnnonce(a)" [title]="'Voir : ' + a.titre">
+            <div class="annonce-icon" [ngClass]="a.type">
+              <mat-icon>{{ a.icon }}</mat-icon>
+            </div>
+            <div class="annonce-info">
+              <div class="annonce-top">
+                <strong>{{ a.titre }}</strong>
+                <span class="annonce-type-badge" [ngClass]="a.type">{{ libelleType(a.type) }}</span>
+              </div>
+              <p>{{ a.desc }}</p>
+              <small><mat-icon>access_time</mat-icon> {{ a.date }}</small>
+            </div>
+            <div class="annonce-nav-arrow">
+              <mat-icon>chevron_right</mat-icon>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

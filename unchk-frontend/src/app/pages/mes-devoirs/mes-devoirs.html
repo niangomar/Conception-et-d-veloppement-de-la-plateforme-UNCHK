@@ -1,0 +1,254 @@
+<div class="app-wrapper">
+
+  <!-- ═══════════════════════════ SIDEBAR ═══════════════════════════ -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <img src="logoUnchk.png" alt="Logo" class="nav-logo">
+      <span class="nav-title">UN Cheikh Hamidou Kane</span>
+    </div>
+
+    <div class="menu-label">MENU ÉTUDIANT</div>
+
+    <a class="menu-item" routerLink="/dashboard-etudiant" routerLinkActive="active">
+      <mat-icon>home</mat-icon><span>Tableau de bord</span>
+    </a>
+    <a class="menu-item" routerLink="/emploi-du-temps" routerLinkActive="active">
+      <mat-icon>calendar_today</mat-icon><span>Emploi du temps</span>
+    </a>
+    <a class="menu-item" routerLink="/mes-devoirs" routerLinkActive="active">
+      <mat-icon>assignment</mat-icon><span>Mes devoirs</span>
+    </a>
+    <a class="menu-item" routerLink="/examens-etudiant" routerLinkActive="active">
+      <mat-icon>quiz</mat-icon><span>Examens</span>
+    </a>
+    <a class="menu-item" routerLink="/mes-documents" routerLinkActive="active">
+      <mat-icon>description</mat-icon><span>Mes documents</span>
+    </a>
+    <a class="menu-item" routerLink="/annonces" routerLinkActive="active">
+      <mat-icon>campaign</mat-icon><span>Annonces</span>
+    </a>
+    <a class="menu-item" routerLink="/mon-profil" routerLinkActive="active">
+      <mat-icon>person</mat-icon><span>Mon profil</span>
+    </a>
+
+    <div class="sidebar-footer">
+      <div class="year-badge">
+        <mat-icon>school</mat-icon>
+        <div>
+          <small>Année universitaire</small>
+          <strong>2025 - 2026</strong>
+        </div>
+      </div>
+      <a class="menu-item logout" routerLink="/login">
+        <mat-icon>logout</mat-icon><span>Déconnexion</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ CONTENU PRINCIPAL ═════════════════════ -->
+  <div class="main-content">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <h2>Mes devoirs</h2>
+      <div class="topbar-right">
+        <div class="notif-btn">
+          <mat-icon>notifications</mat-icon>
+          <span class="badge">3</span>
+        </div>
+        <div class="user-info">
+          <div class="avatar">{{ prenomUtilisateur[0] }}{{ nomUtilisateur[0] }}</div>
+          <span>{{ prenomUtilisateur }} {{ nomUtilisateur }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="body-content">
+
+      <div class="welcome">
+        <h1>📝 Mes devoirs</h1>
+        <p>Suivez vos travaux à rendre</p>
+      </div>
+
+      <!-- ── Stats rapides (dynamiques) ── -->
+      <div class="stats-grid">
+        <div class="stat-card red">
+          <div class="stat-icon"><mat-icon>warning</mat-icon></div>
+          <div class="stat-info">
+            <h2>{{ nbUrgent }}</h2>
+            <p>Urgent</p>
+            <small>moins de 3 jours</small>
+          </div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon"><mat-icon>schedule</mat-icon></div>
+          <div class="stat-info">
+            <h2>{{ nbEnCours }}</h2>
+            <p>En cours</p>
+            <small>cette semaine</small>
+          </div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon"><mat-icon>check_circle</mat-icon></div>
+          <div class="stat-info">
+            <h2>{{ nbRendu }}</h2>
+            <p>Rendu</p>
+            <small>ce semestre</small>
+          </div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-icon"><mat-icon>assignment</mat-icon></div>
+          <div class="stat-info">
+            <h2>{{ nbTotal }}</h2>
+            <p>Total</p>
+            <small>ce semestre</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Liste des devoirs ── -->
+      <div class="card">
+        <div class="card-header">
+          <h3>📋 Liste des devoirs</h3>
+        </div>
+
+        <div class="devoirs-list">
+          <div class="devoir-item" *ngFor="let d of devoirs">
+
+            <div class="devoir-icon" [ngClass]="d.color">
+              <mat-icon>{{ d.icon }}</mat-icon>
+            </div>
+
+            <div class="devoir-info">
+              <strong>{{ d.nom }}</strong>
+              <span class="matiere">{{ d.matiere }}</span>
+              <small>À rendre le {{ d.deadline }}</small>
+            </div>
+
+            <div class="devoir-right">
+              <span class="devoir-badge" [ngClass]="d.urgence">
+                {{ d.jours }} jours
+              </span>
+              <span class="statut" [ngClass]="d.statut">
+                {{ d.statut === 'rendu' ? '✓ Rendu' : '⏳ En cours' }}
+              </span>
+              <!-- Bouton soumettre : visible uniquement si en cours -->
+              <button
+                *ngIf="d.statut === 'en-cours'"
+                class="btn-submit"
+                (click)="ouvrirModalSoumission(d)">
+                <mat-icon>upload</mat-icon>
+                Soumettre
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /body-content -->
+  </div><!-- /main-content -->
+
+</div><!-- /app-wrapper -->
+
+
+<!-- ═══════════════════════════ MODAL SOUMISSION ══════════════════════════ -->
+<div class="modal-overlay" *ngIf="modalOuvert" (click)="fermerModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+
+    <!-- En-tête -->
+    <div class="modal-header">
+      <h3><mat-icon>upload_file</mat-icon> Soumettre un devoir</h3>
+      <button class="btn-close" (click)="fermerModal()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Infos du devoir sélectionné -->
+    <div class="modal-devoir-info" *ngIf="devoirSelectionne">
+      <div class="devoir-icon" [ngClass]="devoirSelectionne.color">
+        <mat-icon>{{ devoirSelectionne.icon }}</mat-icon>
+      </div>
+      <div>
+        <div class="modal-nom">{{ devoirSelectionne.nom }}</div>
+        <div class="modal-matiere">{{ devoirSelectionne.matiere }}</div>
+        <div class="modal-deadline">
+          <mat-icon style="font-size:13px;width:13px;height:13px;vertical-align:middle">event</mat-icon>
+          À rendre le {{ devoirSelectionne.deadline }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Commentaire -->
+    <div class="form-group">
+      <label>
+        Commentaire
+        <span class="optionnel">(optionnel)</span>
+      </label>
+      <textarea
+        [(ngModel)]="commentaire"
+        placeholder="Ajoutez une note pour votre professeur...">
+      </textarea>
+    </div>
+
+    <!-- Zone upload -->
+    <div class="form-group">
+      <label>
+        Fichier à joindre
+        <span class="requis">*</span>
+      </label>
+
+      <div
+        class="upload-zone"
+        [class.upload-error]="uploadErreur"
+        (click)="fileInput.click()">
+        <mat-icon class="upload-icon">folder_open</mat-icon>
+        <p>Cliquez pour choisir un fichier</p>
+        <span>PDF, DOCX, ZIP — max 20 Mo</span>
+      </div>
+
+      <!-- Input fichier caché -->
+      <input
+        #fileInput
+        type="file"
+        hidden
+        accept=".pdf,.doc,.docx,.zip,.rar"
+        (change)="onFichierChoisi($event)">
+
+      <!-- Aperçu fichier choisi -->
+      <div class="file-preview" *ngIf="fichierChoisi">
+        <mat-icon>insert_drive_file</mat-icon>
+        <span>{{ fichierChoisi.name }}</span>
+        <button class="btn-remove-file" (click)="supprimerFichier()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <!-- Message d'erreur -->
+      <p class="upload-error-msg" *ngIf="uploadErreur">
+        <mat-icon style="font-size:14px;width:14px;height:14px;vertical-align:middle">error</mat-icon>
+        Veuillez joindre un fichier avant de soumettre.
+      </p>
+    </div>
+
+    <!-- Pied de modal -->
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="fermerModal()">
+        Annuler
+      </button>
+      <button class="btn-confirm" (click)="confirmerSoumission()">
+        <mat-icon>send</mat-icon>
+        Confirmer la soumission
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════ TOAST SUCCÈS ═════════════════════════════ -->
+<div class="success-toast" [class.show]="toastVisible">
+  <mat-icon>check_circle</mat-icon>
+  Devoir soumis avec succès !
+</div>
